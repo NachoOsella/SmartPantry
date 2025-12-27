@@ -26,7 +26,15 @@ public class AuthService implements IAuthService {
      */
     @Override
     public void register(RegisterRequest request) {
-        User user = new User();
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Username is already taken");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email is already registered");
+        }
+
+        User user = modelMapper.map(request, User.class);
+        userRepository.save(user);
     }
 
     /**
@@ -38,6 +46,13 @@ public class AuthService implements IAuthService {
      */
     @Override
     public AuthResponse login(LoginRequest request) {
-        return null;
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
+
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+        return modelMapper.map(user, AuthResponse.class);
     }
 }
