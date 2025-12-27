@@ -1,89 +1,69 @@
-# SmartPantry 🍎🥫
+# SmartPantry
 
-SmartPantry is a modern Spring Boot application designed to help users efficiently manage their home pantry. It tracks product expiration dates, categorizes items, and provides a foundation for a proactive notification system to reduce food waste.
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-3.9+-C71A36?style=for-the-badge&logo=apache-maven&logoColor=white)](https://maven.apache.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4479A1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
 
-## 🚀 Features
+SmartPantry is a robust enterprise-grade solution designed for domestic inventory management and food waste reduction. The system provides automated tracking of product life cycles through a specialized expiration status engine.
 
-- **Pantry Management:** Full CRUD operations for products in your pantry.
-- **Smart Expiration Tracking:** Automatic status calculation (RED, YELLOW, GREEN) based on expiration dates.
-- **Category System:** Organize products by types (Dairy, Grains, Canned Goods, etc.).
-- **Secure Authentication:** User registration and login system.
-- **Resource Ownership:** Strict security logic ensuring users only access their own data.
+## System Architecture
 
-## 🛠️ Tech Stack
+The application is built on a decoupled architecture to ensure scalability and maintainability:
 
-### Backend
-- **Language:** Java 21
-- **Framework:** Spring Boot 4.0.1
-- **Build System:** Maven
-- **Persistence:** Spring Data JPA
-- **Database:** 
-  - **Dev:** H2 (In-memory)
-  - **Prod:** PostgreSQL
-- **Mapping:** ModelMapper 3.2.0
-- **Boilerplate:** Project Lombok
+*   **Backend:** Java-based RESTful API leveraging the Spring Boot ecosystem.
+*   **Frontend:** Single Page Application (SPA) developed with Angular.
+*   **Persistence:** Relational data modeling with JPA/Hibernate and PostgreSQL.
+*   **Authentication:** Stateless security context (JWT ready).
 
-### Frontend (Upcoming)
-- **Framework:** Angular 19+
-- **Styling:** Tailwind CSS / Angular Material
-- **State Management:** RxJS / Signals
+## Key Functionalities
 
-## 📁 Project Structure
+*   **Inventory Lifecycle Management:** Complete oversight of pantry products and stock levels.
+*   **Expiration Engine:** Automated categorization of products into Red, Yellow, and Green status based on proximity to expiration.
+*   **Categorization System:** Hierarchical organization of inventory items.
+*   **User Isolation:** Multi-tenant data structure ensuring resource ownership and security at the service layer.
 
-The backend follows a standard layered architecture:
+## Technical Specifications
+
+### Prerequisites
+*   Java Development Kit (JDK) 21
+*   Apache Maven 3.9+
+*   PostgreSQL (Production) / H2 (Development)
+
+### Build and Execution
+Compile the project and install dependencies:
+```bash
+./mvnw clean install
+```
+
+Run the application in development mode:
+```bash
+./mvnw spring-boot:run
+```
+
+## API Documentation
+
+The REST API exposes the following primary endpoints:
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/auth/register` | `POST` | User account creation. |
+| `/api/auth/login` | `POST` | Identity verification and session initialization. |
+| `/api/products` | `GET` | Retrieval of authenticated user's inventory. |
+| `/api/products` | `POST` | Registry of new inventory items. |
+| `/api/products/status/{status}` | `GET` | Filtered retrieval by expiration risk level. |
+| `/api/categories` | `GET` | Listing of available inventory categories. |
+
+## Project Structure
 
 ```text
 src/main/java/SmartPantry/demo/
-├── configs/      # Bean configurations (ModelMapper, etc.)
-├── controllers/  # REST API Endpoints
-├── dtos/         # Data Transfer Objects (Requests/Responses)
-├── entities/     # JPA Entities and Enums
-├── exceptions/   # Global Error Handling
-├── repositories/ # Data Access Layer
-└── services/     # Business Logic (Interface-based)
+├── configs/      # Application and bean configurations.
+├── controllers/  # REST API controllers and request mapping.
+├── dtos/         # Data transfer objects for API contracts.
+├── entities/     # Domain models and JPA entities.
+├── exceptions/   # Centralized error handling and advice.
+├── repositories/ # Data access interfaces.
+└── services/     # Business logic and service abstractions.
 ```
-
-## ⚙️ Installation & Setup
-
-### Prerequisites
-- JDK 21
-- Maven 3.9+
-
-### Commands
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd SmartPantry
-   ```
-
-2. **Compile and build:**
-   ```bash
-   ./mvnw clean install
-   ```
-
-3. **Run the application:**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-   *The server will start at `http://localhost:8080`*
-
-## 🛣️ API Roadmap
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Create a new user account |
-| POST | `/api/auth/login` | Authenticate and get token |
-| GET | `/api/products` | List all products for current user |
-| POST | `/api/products` | Add a new product to pantry |
-| GET | `/api/products/status/{status}` | Filter by expiry status (RED/YELLOW/GREEN) |
-| GET | `/api/categories` | List all available categories |
-
-## 🔮 Future Roadmap
-
-- **Angular Frontend:** Implementation of a responsive SPA to manage the pantry from any device.
-- **Push Notifications:** Alert users when products are about to expire.
-- **Recipe Suggestions:** Integration with external APIs to suggest recipes based on available pantry items.
-- **Barcode Scanner:** Mobile integration for quick product entry.
-
----
-*Developed as part of a modern software engineering practice.*
