@@ -17,8 +17,7 @@ public class UserService implements IUserService {
 
     /**
      * TO DO: 1. Obtain current security context (when Security is added). 2. Find
-     * user in DB. 3. Map
-     * to UserResponse.
+     * user in DB. 3. Map to UserResponse.
      */
     @Override
     public UserResponse getCurrentUserResponse() {
