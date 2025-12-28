@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementation for managing product categories.
+ */
 @Service
 @RequiredArgsConstructor
 public class CategoryService implements ICategoryService {
@@ -19,6 +22,11 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
+    /**
+     * Retrieves all available categories.
+     *
+     * @return a list of {@link CategoryResponse} objects
+     */
     @Override
     public List<CategoryResponse> getAll() {
         List<Category> categories = categoryRepository.findAll();
@@ -27,6 +35,13 @@ public class CategoryService implements ICategoryService {
                 .toList();
     }
 
+    /**
+     * Creates a new category.
+     *
+     * @param request the category details to be created
+     * @return the created {@link CategoryResponse}
+     * @throws IllegalArgumentException if a category with the same name already exists
+     */
     @Override
     @Transactional
     public CategoryResponse create(CategoryRequest request) {
