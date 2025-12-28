@@ -10,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final SmartPantry.demo.configs.JwtUtil jwtUtil;
 
     /**
      * TO DO: Implement registration logic.
@@ -53,6 +56,12 @@ public class AuthService implements IAuthService {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        return modelMapper.map(user, AuthResponse.class);
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+
+        return AuthResponse.builder()
+                .token(token)
+                .username(user.getUsername())
+                .roles(Set.copyOf(user.getRoles().stream().map(Enum::name).toList()))
+                .build();
     }
 }

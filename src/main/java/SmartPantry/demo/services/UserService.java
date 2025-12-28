@@ -15,21 +15,18 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
-    /**
-     * TO DO: 1. Obtain current security context (when Security is added). 2. Find
-     * user in DB. 3. Map to UserResponse.
-     */
     @Override
     public UserResponse getCurrentUserResponse() {
-        return null;
+        Long userId = SmartPantry.demo.configs.UserContext.getCurrentUserId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return modelMapper.map(user, UserResponse.class);
     }
 
-    /**
-     * TO DO: This is a helper for other services. 1. Return the User entity of the
-     * logged-in user.
-     */
     @Override
     public User getCurrentUserEntity() {
-        return null;
+        Long userId = SmartPantry.demo.configs.UserContext.getCurrentUserId();
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }
