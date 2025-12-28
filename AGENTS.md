@@ -1,38 +1,38 @@
-# Agent Guide - SmartPantry
+# Agent Guide - SmartPantry Monorepo
 
 This document provides essential information for autonomous agents working on the SmartPantry project.
 
 ## 1. Project Overview
-SmartPantry is a Spring Boot application designed to manage a pantry, track product expiration dates, and notify users.
+SmartPantry is a monorepo containing a Spring Boot backend and an Angular frontend.
 
+### Backend
+- **Location:** `/backend`
 - **Language:** Java 21
 - **Framework:** Spring Boot 4.0.1
 - **Build System:** Maven
-- **Database:** H2 (Dev), PostgreSQL (Prod)
-- **Mapping:** ModelMapper 3.2.0
-- **Boilerplate:** Project Lombok
+
+### Frontend
+- **Location:** `/frontend`
+- **Language:** TypeScript
+- **Framework:** Angular 19+
+- **Build System:** npm
 
 ## 2. Critical Commands
 
-### Build and Compilation
-- **Compile project:** `./mvnw clean compile`
-- **Build JAR:** `./mvnw clean package`
-- **Install to local repo:** `./mvnw clean install`
+### Backend (from /backend)
+- **Compile:** `./mvnw clean compile`
+- **Test:** `./mvnw test`
+- **Run:** `./mvnw spring-boot:run`
 
-### Testing
-- **Run all tests:** `./mvnw test`
-- **Run a single test class:** `./mvnw -Dtest=ClassName test`
-- **Run a single test method:** `./mvnw -Dtest=ClassName#methodName test`
-- **Run tests without building:** `./mvnw surefire:test`
-
-### Execution
-- **Run application:** `./mvnw spring-boot:run`
-- **Run with specific profile:** `./mvnw spring-boot:run -Dspring-boot.run.profiles=prod`
+### Frontend (from /frontend)
+- **Install:** `npm install`
+- **Build:** `npm run build`
+- **Test:** `npm test`
+- **Start:** `npm start`
 
 ## 3. Project Structure
-The project follows a standard Spring Boot layered architecture:
-
-- `src/main/java/SmartPantry/demo/`
+- `backend/src/main/java/SmartPantry/demo/`: Java source code.
+- `frontend/src/`: Angular source code.
     - `configs/`: Configuration classes (e.g., ModelMapper).
     - `controllers/`: REST API endpoints.
     - `services/`: Business logic.
