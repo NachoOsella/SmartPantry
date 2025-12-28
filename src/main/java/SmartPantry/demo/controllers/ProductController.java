@@ -7,7 +7,6 @@ import SmartPantry.demo.services.interfaces.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Collections;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
