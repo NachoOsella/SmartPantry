@@ -19,11 +19,6 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
-    /**
-     * TO DO:
-     * 1. Fetch all categories from categoryRepository.
-     * 2. Map to CategoryResponse list.
-     */
     @Override
     public List<CategoryResponse> getAll() {
         List<Category> categories = categoryRepository.findAll();
@@ -32,12 +27,6 @@ public class CategoryService implements ICategoryService {
                 .toList();
     }
 
-    /**
-     * TO DO:
-     * 1. Check if category name already exists.
-     * 2. Map request to entity.
-     * 3. Save and return mapped response.
-     */
     @Override
     @Transactional
     public CategoryResponse create(CategoryRequest request) {

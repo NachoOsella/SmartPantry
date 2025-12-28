@@ -20,13 +20,6 @@ public class AuthService implements IAuthService {
     private final ModelMapper modelMapper;
     private final SmartPantry.demo.configs.JwtUtil jwtUtil;
 
-    /**
-     * TO DO: Implement registration logic.
-     * 1. Validate if username/email already exists using userRepository.
-     * 2. Encrypt the password (when Security is added).
-     * 3. Map RegisterRequest to User entity.
-     * 4. Save the user.
-     */
     @Override
     public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -40,13 +33,6 @@ public class AuthService implements IAuthService {
         userRepository.save(user);
     }
 
-    /**
-     * TO DO: Implement login logic.
-     * 1. Find user by username.
-     * 2. Verify password.
-     * 3. Generate JWT token (future).
-     * 4. Map to AuthResponse.
-     */
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
