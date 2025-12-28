@@ -2,6 +2,8 @@ package SmartPantry.demo.services;
 
 import SmartPantry.demo.dtos.requests.ProductRequest;
 import SmartPantry.demo.dtos.responses.ProductResponse;
+import SmartPantry.demo.entities.Product;
+import SmartPantry.demo.entities.User;
 import SmartPantry.demo.entities.enums.ExpiryStatus;
 import SmartPantry.demo.repositories.CategoryRepository;
 import SmartPantry.demo.repositories.ProductRepository;
@@ -27,11 +29,36 @@ public class ProductService implements IProductService {
      * 1. Get the current logged-in user from userService.
      * 2. Use productRepository.findByUser() to get entities.
      * 3. Map entities to ProductResponse list.
-     * 4. Calculate 'daysRemaining' and 'expiryStatus' during mapping or in a helper method.
+     * 4. Calculate 'daysRemaining' and 'expiryStatus' during mapping or in a helper
+     * method.
      */
     @Override
     public List<ProductResponse> getAllForCurrentUser() {
-        return null;
+        User currentUser = userService.getCurrentUserEntity();
+        List<Product> products = productRepository.findByUser(currentUser);
+        return products.stream().map(product -> {
+            long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(
+                    java.time.LocalDate.now(),
+                    product.getExpirationDate());
+            ExpiryStatus expiryStatus = calculateExpiryStatus(daysRemaining);
+            ProductResponse response = modelMapper.map(product, ProductResponse.class);
+            response.setDaysRemaining(daysRemaining);
+            response.setExpiryStatus(expiryStatus);
+            if (product.getCategory() != null) {
+                response.setCategoryName(product.getCategory().getName());
+            }
+            return response;
+        }).toList();
+    }
+
+    private ExpiryStatus calculateExpiryStatus(long daysRemaining) {
+        if (daysRemaining < 0) {
+            return ExpiryStatus.RED;
+        } else if (daysRemaining <= 7) {
+            return ExpiryStatus.YELLOW;
+        } else {
+            return ExpiryStatus.GREEN;
+        }
     }
 
     /**
@@ -82,9 +109,9 @@ public class ProductService implements IProductService {
      * TO DO:
      * 1. Get current user.
      * 2. Based on ExpiryStatus enum, call specific repository methods:
-     *    - RED: findByUserAndExpirationDateBefore(today)
-     *    - YELLOW: findByUserAndExpirationDateBetween(today, nextWeek)
-     *    - GREEN: findByUserAndExpirationDateAfter(nextWeek)
+     * - RED: findByUserAndExpirationDateBefore(today)
+     * - YELLOW: findByUserAndExpirationDateBetween(today, nextWeek)
+     * - GREEN: findByUserAndExpirationDateAfter(nextWeek)
      */
     @Override
     public List<ProductResponse> getByStatus(ExpiryStatus status) {
