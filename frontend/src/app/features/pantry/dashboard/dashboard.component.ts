@@ -1,28 +1,138 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { ProductService } from '../../../core/services/product.service';
+import { Product, Category } from '../../../core/models/pantry.model';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { CardComponent } from '../../../shared/components/card/card.component';
+import { InputComponent } from '../../../shared/components/input/input.component';
+import { SidePanelComponent } from '../../../shared/components/side-panel/side-panel.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ButtonComponent],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    ButtonComponent, 
+    CardComponent, 
+    InputComponent, 
+    SidePanelComponent
+  ],
   template: `
     <div class="dashboard-layout">
       <nav class="navbar">
         <div class="brand">SmartPantry</div>
         <div class="user-info">
-          <span>Welcome, {{ authService.currentUser()?.username }}</span>
+          <span>{{ authService.currentUser()?.username }}</span>
+          <div class="avatar">{{ authService.currentUser()?.username?.[0]?.toUpperCase() }}</div>
           <sp-button variant="ghost" (click)="authService.logout()">Logout</sp-button>
         </div>
       </nav>
       
       <main class="content">
         <header class="content-header">
-          <h1>Inventory Overview</h1>
-          <p>You are logged in and your session is secure.</p>
+          <div>
+            <h1>Inventory Overview</h1>
+            <p>Manage your products and track expiry dates.</p>
+          </div>
+          <sp-button (click)="openCreatePanel()">
+            <span>+</span> Add Product
+          </sp-button>
         </header>
+
+        <div class="stats-grid">
+          <sp-card class="stat-card">
+            <span class="stat-label">Total Items</span>
+            <span class="stat-value">{{ products().length }}</span>
+          </sp-card>
+          <sp-card class="stat-card">
+            <span class="stat-label">Expiring Soon</span>
+            <span class="stat-value warning">{{ expiringSoonCount() }}</span>
+          </sp-card>
+        </div>
+
+        <sp-card title="Recent Products" [noPadding]="true">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th class="actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of products()">
+                <td><strong>{{ product.name }}</strong></td>
+                <td><span class="category-tag">{{ product.category.name }}</span></td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.expiryDate | date:'mediumDate' }}</td>
+                <td>
+                  <span [class]="'status-badge ' + product.expiryStatus.toLowerCase()">
+                    {{ product.expiryStatus }}
+                  </span>
+                </td>
+                <td class="actions">
+                  <button class="icon-btn" (click)="openEditPanel(product)">Edit</button>
+                  <button class="icon-btn delete" (click)="deleteProduct(product.id)">Delete</button>
+                </td>
+              </tr>
+              <tr *ngIf="products().length === 0">
+                <td colspan="6" class="empty-state">No products found. Add your first item!</td>
+              </tr>
+            </tbody>
+          </table>
+        </sp-card>
       </main>
+
+      <sp-side-panel 
+        [isOpen]="isPanelOpen()" 
+        [title]="editingProduct() ? 'Edit Product' : 'Add New Product'"
+        (onClose)="closePanel()">
+        
+        <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
+          <sp-input
+            label="Product Name"
+            placeholder="e.g. Milk"
+            formControlName="name"
+            [error]="productForm.get('name')?.touched && productForm.get('name')?.invalid ? 'Name is required' : ''"
+          ></sp-input>
+
+          <div class="form-row">
+            <sp-input
+              label="Quantity"
+              type="number"
+              placeholder="0"
+              formControlName="quantity"
+            ></sp-input>
+            
+            <div class="input-container">
+              <label>Category</label>
+              <select formControlName="categoryId" class="select-field">
+                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <sp-input
+            label="Expiry Date"
+            type="date"
+            formControlName="expiryDate"
+            [error]="productForm.get('expiryDate')?.touched && productForm.get('expiryDate')?.invalid ? 'Valid date is required' : ''"
+          ></sp-input>
+
+          <div class="panel-actions">
+            <sp-button variant="ghost" type="button" (click)="closePanel()">Cancel</sp-button>
+            <sp-button type="submit" [disabled]="productForm.invalid || isSaving">
+              {{ isSaving ? 'Saving...' : (editingProduct() ? 'Update Product' : 'Add Product') }}
+            </sp-button>
+          </div>
+        </form>
+      </sp-side-panel>
     </div>
   `,
   styles: [`
@@ -30,6 +140,7 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      background-color: var(--bg-surface);
     }
 
     .navbar {
@@ -46,33 +157,282 @@ import { ButtonComponent } from '../../../shared/components/button/button.compon
       font-weight: 700;
       color: var(--primary);
       font-size: 1.25rem;
+      letter-spacing: -0.025em;
     }
 
     .user-info {
       display: flex;
       align-items: center;
       gap: var(--spacing-md);
-      font-size: 0.875rem;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.75rem;
     }
 
     .content {
       flex: 1;
       padding: var(--spacing-xl);
-      background-color: var(--bg-surface);
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-xl);
     }
 
     .content-header h1 {
-      font-size: 1.5rem;
+      font-size: 1.875rem;
       font-weight: 700;
-      margin-bottom: 0.25rem;
+      color: var(--text-main);
+      letter-spacing: -0.025em;
     }
 
     .content-header p {
       color: var(--text-muted);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .stat-value.warning {
+      color: var(--warning);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .data-table th {
+      padding: var(--spacing-md) var(--spacing-lg);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+    }
+
+    .data-table td {
+      padding: var(--spacing-md) var(--spacing-lg);
+      border-bottom: 1px solid var(--border-color);
       font-size: 0.875rem;
+    }
+
+    .category-tag {
+      padding: 0.25rem 0.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .status-badge.green { background: #dcfce7; color: #166534; }
+    .status-badge.yellow { background: #fef9c3; color: #854d0e; }
+    .status-badge.red { background: #fee2e2; color: #991b1b; }
+
+    .actions {
+      text-align: right;
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: flex-end;
+    }
+
+    .icon-btn {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .icon-btn.delete {
+      color: var(--error);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-xl) !important;
+      color: var(--text-muted);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+    }
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      margin-bottom: 1rem;
+    }
+
+    .input-container label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .select-field {
+      padding: 0.625rem 0.875rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      background-color: white;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-xl);
+    }
+
+    .panel-actions sp-button {
+      flex: 1;
+    }
+
+    ::ng-deep .panel-actions button {
+      width: 100%;
     }
   `]
 })
-export class DashboardComponent {
-  constructor(public authService: AuthService) {}
+export class DashboardComponent implements OnInit {
+  products = signal<Product[]>([]);
+  categories = signal<Category[]>([]);
+  expiringSoonCount = signal(0);
+  
+  isPanelOpen = signal(false);
+  isSaving = false;
+  editingProduct = signal<Product | null>(null);
+  
+  productForm: FormGroup;
+
+  constructor(
+    public authService: AuthService,
+    private productService: ProductService,
+    private fb: FormBuilder
+  ) {
+    this.productForm = this.fb.group({
+      name: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      expiryDate: ['', Validators.required],
+      categoryId: ['', Validators.required]
+    });
+  }
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.productService.getProducts().subscribe(products => {
+      this.products.set(products);
+      this.expiringSoonCount.set(products.filter(p => p.expiryStatus !== 'GREEN').length);
+    });
+    this.productService.getCategories().subscribe(categories => {
+      this.categories.set(categories);
+      if (categories.length > 0 && !this.productForm.get('categoryId')?.value) {
+        this.productForm.patchValue({ categoryId: categories[0].id });
+      }
+    });
+  }
+
+  openCreatePanel() {
+    this.editingProduct.set(null);
+    this.productForm.reset({
+      quantity: 1,
+      categoryId: this.categories()[0]?.id
+    });
+    this.isPanelOpen.set(true);
+  }
+
+  openEditPanel(product: Product) {
+    this.editingProduct.set(product);
+    this.productForm.patchValue({
+      name: product.name,
+      quantity: product.quantity,
+      expiryDate: product.expiryDate.split('T')[0],
+      categoryId: product.category.id
+    });
+    this.isPanelOpen.set(true);
+  }
+
+  closePanel() {
+    this.isPanelOpen.set(false);
+  }
+
+  saveProduct() {
+    if (this.productForm.valid) {
+      this.isSaving = true;
+      const productData = this.productForm.value;
+      const editing = this.editingProduct();
+
+      const obs = editing 
+        ? this.productService.updateProduct(editing.id, productData)
+        : this.productService.createProduct(productData);
+
+      obs.subscribe({
+        next: () => {
+          this.isSaving = false;
+          this.closePanel();
+          this.loadData();
+        },
+        error: () => this.isSaving = false
+      });
+    }
+  }
+
+  deleteProduct(id: number) {
+    if (confirm('Are you sure you want to delete this product?')) {
+      this.productService.deleteProduct(id).subscribe(() => this.loadData());
+    }
+  }
 }
