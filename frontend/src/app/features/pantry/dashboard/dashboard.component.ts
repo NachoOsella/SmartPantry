@@ -112,9 +112,28 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
             
             <div class="input-container">
               <label>Category</label>
-              <select formControlName="categoryId" class="select-field">
-                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
-              </select>
+              <div class="category-input-group">
+                <select formControlName="categoryId" class="select-field">
+                  <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
+                </select>
+                <button type="button" class="add-cat-btn" (click)="toggleNewCategory()">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="new-category-inline" *ngIf="isAddingCategory()">
+            <sp-input
+              #newCatInput
+              label="New Category Name"
+              placeholder="e.g. Dairy"
+              [value]="newCategoryName()"
+              (input)="updateNewCategoryName($event)"
+            ></sp-input>
+            <div class="new-cat-actions">
+              <sp-button variant="ghost" type="button" (click)="toggleNewCategory()">Cancel</sp-button>
+              <sp-button type="button" (click)="saveCategory()" [disabled]="!newCategoryName() || isSavingCategory">
+                Add
+              </sp-button>
             </div>
           </div>
 
@@ -327,6 +346,55 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
       border-radius: 4px;
       font-size: 0.875rem;
       background-color: white;
+      flex: 1;
+    }
+
+    .category-input-group {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .add-cat-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .add-cat-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .new-category-inline {
+      margin-top: -var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--bg-surface);
+      border-radius: 8px;
+      border: 1px dashed var(--border-color);
+    }
+
+    .new-cat-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      justify-content: flex-end;
+    }
+
+    .new-cat-actions sp-button {
+      flex: 0 1 auto;
+    }
+
+    ::ng-deep .new-cat-actions button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
     }
 
     .panel-actions {
@@ -352,6 +420,10 @@ export class DashboardComponent implements OnInit {
   isPanelOpen = signal(false);
   isSaving = false;
   editingProduct = signal<Product | null>(null);
+
+  isAddingCategory = signal(false);
+  newCategoryName = signal('');
+  isSavingCategory = false;
   
   productForm: FormGroup;
 
@@ -407,6 +479,40 @@ export class DashboardComponent implements OnInit {
 
   closePanel() {
     this.isPanelOpen.set(false);
+    this.isAddingCategory.set(false);
+    this.newCategoryName.set('');
+  }
+
+  toggleNewCategory() {
+    this.isAddingCategory.set(!this.isAddingCategory());
+    this.newCategoryName.set('');
+  }
+
+  updateNewCategoryName(event: any) {
+    this.newCategoryName.set(event.target.value);
+  }
+
+  saveCategory() {
+    const name = this.newCategoryName().trim();
+    if (name) {
+      this.isSavingCategory = true;
+      this.productService.createCategory({ name }).subscribe({
+        next: (newCat) => {
+          this.isSavingCategory = false;
+          this.isAddingCategory.set(false);
+          this.newCategoryName.set('');
+          
+          // Refresh categories and select the new one
+          this.productService.getCategories().subscribe(categories => {
+            this.categories.set(categories);
+            this.productForm.patchValue({ categoryId: newCat.id });
+          });
+        },
+        error: () => {
+          this.isSavingCategory = false;
+        }
+      });
+    }
   }
 
   saveProduct() {

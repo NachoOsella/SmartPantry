@@ -70,8 +70,8 @@ export class InputComponent implements ControlValueAccessor {
   @Input() id = 'input-' + Math.random().toString(36).substring(2, 9);
   @Input() error = '';
   @Input() disabled = false;
+  @Input() value = '';
 
-  value = '';
   onChange: any = () => {};
   onTouched: any = () => {};
 

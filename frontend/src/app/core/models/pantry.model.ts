@@ -3,6 +3,10 @@ export interface Category {
   name: string;
 }
 
+export interface CategoryRequest {
+  name: string;
+}
+
 export interface Product {
   id: number;
   name: string;

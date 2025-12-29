@@ -34,4 +34,8 @@ export class ProductService {
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseUrl}/categories`);
   }
+
+  createCategory(category: { name: string }): Observable<Category> {
+    return this.http.post<Category>(`${this.baseUrl}/categories`, category);
+  }
 }

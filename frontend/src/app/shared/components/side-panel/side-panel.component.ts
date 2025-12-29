@@ -7,12 +7,12 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div class="overlay" *ngIf="isOpen" (click)="close()"></div>
-    <div class="panel" [class.open]="isOpen">
-      <header class="panel-header">
+    <div class="modal" [class.open]="isOpen">
+      <header class="modal-header">
         <h2>{{ title }}</h2>
         <button class="close-btn" (click)="close()">&times;</button>
       </header>
-      <div class="panel-content">
+      <div class="modal-content">
         <ng-content></ng-content>
       </div>
     </div>
@@ -24,32 +24,38 @@ import { CommonModule } from '@angular/common';
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(2px);
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
       z-index: 1000;
       transition: opacity 0.3s ease;
     }
 
-    .panel {
+    .modal {
       position: fixed;
-      top: 0;
-      right: -100%;
-      width: 100%;
-      max-width: 480px;
-      height: 100%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -45%);
+      width: 90%;
+      max-width: 500px;
       background: white;
       z-index: 1001;
-      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.05);
-      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
+      max-height: 90vh;
     }
 
-    .panel.open {
-      right: 0;
+    .modal.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%);
     }
 
-    .panel-header {
+    .modal-header {
       padding: var(--spacing-lg) var(--spacing-xl);
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -57,24 +63,33 @@ import { CommonModule } from '@angular/common';
       align-items: center;
     }
 
-    .panel-header h2 {
+    .modal-header h2 {
       font-size: 1.25rem;
       font-weight: 600;
       color: var(--primary);
+      margin: 0;
     }
 
     .close-btn {
-      font-size: 2rem;
+      font-size: 1.5rem;
       color: var(--text-muted);
       line-height: 1;
       padding: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: background 0.2s;
     }
 
     .close-btn:hover {
+      background: var(--bg-surface);
       color: var(--text-main);
     }
 
-    .panel-content {
+    .modal-content {
       flex: 1;
       padding: var(--spacing-xl);
       overflow-y: auto;
