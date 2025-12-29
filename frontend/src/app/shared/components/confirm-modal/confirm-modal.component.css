@@ -1,0 +1,82 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1100;
+  transition: opacity 0.3s ease;
+}
+
+.confirm-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -45%) scale(0.95);
+  width: 90%;
+  max-width: 400px;
+  background: var(--bg1);
+  z-index: 1101;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.confirm-modal.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.warning-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(230, 126, 128, 0.1);
+  color: var(--red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.warning-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--fg);
+  margin-bottom: 0.75rem;
+}
+
+p {
+  color: var(--fg-dim);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-footer sp-button {
+  flex: 1;
+}
+
+::ng-deep .modal-footer button {
+  width: 100%;
+}

@@ -175,4 +175,12 @@
       </div>
     </form>
   </sp-side-panel>
+
+  <sp-confirm-modal
+    [isOpen]="isDeleteModalOpen()"
+    title="Delete Product"
+    message="This action is permanent. Are you sure you want to remove this item from your inventory?"
+    (onConfirm)="confirmDelete()"
+    (onCancel)="closeDeleteModal()"
+  ></sp-confirm-modal>
 </div>
