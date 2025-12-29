@@ -1,22 +1,39 @@
 # SmartPantry Monorepo
 
-[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
+SmartPantry is a premium, high-performance solution designed for domestic inventory management and food waste reduction. This repository is organized as a monorepo featuring a Java Spring Boot backend and an Angular 19 frontend with a sophisticated Everforest Dark aesthetic.
 
-SmartPantry is a robust solution designed for domestic inventory management and food waste reduction. This repository is organized as a monorepo containing both the backend and frontend applications.
+## 🚀 Quick Start with Docker
 
-## Project Structure
-
-- `backend/`: Java-based RESTful API leveraging the Spring Boot ecosystem.
-- `frontend/`: Single Page Application (SPA) developed with Angular.
-
-## Getting Started
+The easiest way to run the entire stack (Frontend, Backend, and Database) is using Docker Compose.
 
 ### Prerequisites
-- Java Development Kit (JDK) 21
-- Node.js & npm (LTS recommended)
-- Apache Maven 3.9+ (or use the wrapper in `backend/`)
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Execution
+From the root directory, run:
+```bash
+docker compose up --build
+```
+
+The services will be available at:
+- **Frontend**: [http://localhost:80](http://localhost:80)
+- **Backend API**: [http://localhost:8080](http://localhost:8080)
+- **Database**: PostgreSQL on port `5432`
+
+---
+
+## 🛠 Project Structure
+
+- `backend/`: Java 21 RESTful API using **Spring Boot 4.0.1**.
+  - Optimized with Google Distroless for security and minimal image size.
+- `frontend/`: Single Page Application (SPA) using **Angular 19+**.
+  - Premium **Everforest Dark** UI with Glassmorphism and Material Icons.
+  - Real-time search, staggered animations, and skeleton loading.
+
+---
+
+## 💻 Manual Development
 
 ### Backend Execution
 Navigate to the `backend` directory:
@@ -33,6 +50,11 @@ npm install
 npm start
 ```
 
-## Documentation
-For more details on coding standards and instructions for agents, please refer to [AGENTS.md](./AGENTS.md).
-Specific documentation for the API and architecture can be found within the `backend/` and `frontend/` directories.
+---
+
+## 🛡 Security & Design
+- **Authentication**: JWT-based security with route protection.
+- **Persistence**: PostgreSQL 17 with Docker volumes for data durability.
+- **UI/UX**: Smart/Dumb component architecture, responsive layout, and custom notification system.
+
+For more details on coding standards, please refer to [AGENTS.md](./AGENTS.md).

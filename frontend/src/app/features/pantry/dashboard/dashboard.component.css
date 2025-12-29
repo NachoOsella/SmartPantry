@@ -405,7 +405,7 @@
 .select-wrapper {
   display: flex;
   gap: 0.5rem;
-  height: 45.5px; /* Exact match for sp-input height */
+  height: 46px; /* Exact match for sp-input height */
 }
 
 .custom-select {
@@ -426,8 +426,8 @@
 }
 
 .btn-add-inline {
-  width: 45.5px;
-  height: 45.5px;
+  width: 46px;
+  height: 46px;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 6px;
