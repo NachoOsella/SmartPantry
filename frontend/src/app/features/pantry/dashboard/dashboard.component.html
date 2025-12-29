@@ -1,5 +1,5 @@
 <div class="dashboard-layout">
-  <nav class="navbar">
+  <nav class="navbar glass">
     <div class="navbar-content">
       <div class="brand">
         <div class="logo-sm">
@@ -35,28 +35,38 @@
       </header>
 
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon blue">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        @if (isLoading()) {
+          <div class="stat-card skeleton-pulse"></div>
+          <div class="stat-card skeleton-pulse"></div>
+        } @else {
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            </div>
+            <div class="stat-data">
+              <span class="stat-label">Total Items</span>
+              <span class="stat-value">{{ products().length }}</span>
+            </div>
           </div>
-          <div class="stat-data">
-            <span class="stat-label">Total Items</span>
-            <span class="stat-value">{{ products().length }}</span>
+          
+          <div class="stat-card">
+            <div class="stat-icon yellow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <div class="stat-data">
+              <span class="stat-label">Expiring Soon</span>
+              <span class="stat-value warning">{{ expiringSoonCount() }}</span>
+            </div>
           </div>
-        </div>
-        
-        <div class="stat-card">
-          <div class="stat-icon yellow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-          </div>
-          <div class="stat-data">
-            <span class="stat-label">Expiring Soon</span>
-            <span class="stat-value warning">{{ expiringSoonCount() }}</span>
-          </div>
-        </div>
+        }
       </div>
 
       <sp-card title="Stock Records" [noPadding]="true">
+        <div header-actions class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" placeholder="Search product..." (input)="updateSearch($event)" [value]="searchTerm()">
+        </div>
+
         <div class="table-container">
           <table class="data-table">
             <thead>
@@ -69,38 +79,46 @@
                 <th class="actions-col">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              @for (product of products(); track product.id) {
-                <tr>
-                  <td><span class="product-name">{{ product.name }}</span></td>
-                  <td><span class="category-badge">{{ product.categoryName }}</span></td>
-                  <td><span class="quantity-text">{{ product.quantity }} units</span></td>
-                  <td><span class="date-text">{{ product.expirationDate | date:'MMM d, y' }}</span></td>
-                  <td>
-                    <span [class]="'status-pill ' + statusMap[product.expiryStatus].class">
-                      {{ statusMap[product.expiryStatus].label }}
-                    </span>
-                  </td>
-                  <td class="actions-col">
-                    <div class="action-buttons">
-                      <button class="action-btn edit" (click)="openEditPanel(product)" title="Edit Product">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                      </button>
-                      <button class="action-btn delete" (click)="deleteProduct(product.id)" title="Delete Product">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="6" class="empty-state">
-                    <div class="empty-content">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
-                      <p>No products found. Add your first item to get started!</p>
-                    </div>
-                  </td>
-                </tr>
+            <tbody [@listAnimation]="filteredProducts().length">
+              @if (isLoading()) {
+                @for (i of [1,2,3,4,5]; track i) {
+                  <tr>
+                    <td colspan="6"><div class="skeleton-row skeleton-pulse"></div></td>
+                  </tr>
+                }
+              } @else {
+                @for (product of filteredProducts(); track product.id) {
+                  <tr class="product-row">
+                    <td><span class="product-name">{{ product.name }}</span></td>
+                    <td><span class="category-badge">{{ product.categoryName }}</span></td>
+                    <td><span class="quantity-text">{{ product.quantity }} units</span></td>
+                    <td><span class="date-text">{{ product.expirationDate | date:'MMM d, y' }}</span></td>
+                    <td>
+                      <span [class]="'status-pill ' + statusMap[product.expiryStatus].class">
+                        {{ statusMap[product.expiryStatus].label }}
+                      </span>
+                    </td>
+                    <td class="actions-col">
+                      <div class="action-buttons">
+                        <button class="action-btn edit" (click)="openEditPanel(product)" title="Edit Product">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button class="action-btn delete" (click)="onRequestDelete(product.id)" title="Delete Product">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="empty-state">
+                      <div class="empty-content">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="13" y2="17"></line></svg>
+                        <p>{{ searchTerm() ? 'No products match your search.' : 'No products found. Add your first item to get started!' }}</p>
+                      </div>
+                    </td>
+                  </tr>
+                }
               }
             </tbody>
           </table>

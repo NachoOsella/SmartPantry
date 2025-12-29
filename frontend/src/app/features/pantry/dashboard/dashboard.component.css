@@ -5,16 +5,121 @@
   background-color: var(--bg0);
 }
 
-/* Navbar */
-.navbar {
-  height: 72px;
-  background: var(--bg1);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
+/* Navbar Glassmorphism */
+.navbar.glass {
+  background: rgba(52, 63, 68, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(211, 198, 170, 0.1);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
+}
+
+/* Skeleton Loading */
+.skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    var(--bg2) 25%,
+    var(--bg3) 50%,
+    var(--bg2) 75%
+  );
+  background-size: 200% 100%;
+  animation: pulse 1.5s infinite;
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+.skeleton-row {
+  height: 24px;
+  width: 100%;
+  border-radius: 4px;
+  background: var(--bg2);
+}
+
+@keyframes pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Search Box */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 280px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--fg-dim);
+  pointer-events: none;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  background: var(--bg-dim);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--fg);
+  transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg0);
+  box-shadow: 0 0 0 2px var(--primary-bg);
+}
+
+/* Tooltip Simulation (Simple version) */
+.action-btn {
+  position: relative;
+}
+
+.action-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  padding: 4px 8px;
+  background: var(--bg-dim);
+  color: var(--fg);
+  font-size: 0.7rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  z-index: 10;
+}
+
+.action-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.product-row {
+  transition: all 0.2s ease;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.product-row:hover {
+  background-color: rgba(167, 192, 128, 0.05) !important;
+  transform: scale(1.002);
 }
 
 .navbar-content {
