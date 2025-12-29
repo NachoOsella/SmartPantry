@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AuthResponse, LoginRequest, User } from '../models/auth.model';
+import { AuthResponse, LoginRequest, RegisterRequest, User } from '../models/auth.model';
 import { tap } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -17,6 +17,10 @@ export class AuthService {
   isAuthenticated = computed(() => !!this._currentUser());
 
   constructor(private http: HttpClient, private router: Router) {}
+
+  register(data: RegisterRequest) {
+    return this.http.post<void>(`${this.apiUrl}/register`, data);
+  }
 
   login(credentials: LoginRequest) {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(

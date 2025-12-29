@@ -8,7 +8,7 @@ import { InputComponent } from '../../../shared/components/input/input.component
 import { CardComponent } from '../../../shared/components/card/card.component';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule, 
@@ -19,52 +19,65 @@ import { CardComponent } from '../../../shared/components/card/card.component';
     RouterModule
   ],
   template: `
-    <div class="login-container">
-      <div class="login-box">
-        <header class="login-header">
+    <div class="register-container">
+      <div class="register-box">
+        <header class="register-header">
           <h1>SmartPantry</h1>
-          <p>Manage your inventory with precision.</p>
+          <p>Create an account to start managing your pantry.</p>
         </header>
 
         <sp-card>
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
             <sp-input
               id="username"
               label="Username"
-              placeholder="Enter your username"
+              placeholder="Choose a username"
               formControlName="username"
-              [error]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid ? 'Username is required' : ''"
+              [error]="registerForm.get('username')?.touched && registerForm.get('username')?.invalid ? 'Username is required' : ''"
+            ></sp-input>
+
+            <sp-input
+              id="email"
+              label="Email"
+              type="email"
+              placeholder="your@email.com"
+              formControlName="email"
+              [error]="registerForm.get('email')?.touched && registerForm.get('email')?.invalid ? 'Valid email is required' : ''"
             ></sp-input>
 
             <sp-input
               id="password"
               label="Password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Create a password"
               formControlName="password"
-              [error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid ? 'Password is required' : ''"
+              [error]="registerForm.get('password')?.touched && registerForm.get('password')?.invalid ? 'Password (min 6 chars) is required' : ''"
             ></sp-input>
 
             <div class="form-actions">
-              <sp-button type="submit" [disabled]="loginForm.invalid || isLoading">
-                {{ isLoading ? 'Signing in...' : 'Sign in' }}
+              <sp-button type="submit" [disabled]="registerForm.invalid || isLoading">
+                {{ isLoading ? 'Creating account...' : 'Create account' }}
               </sp-button>
             </div>
 
             <div class="error-banner" *ngIf="errorMessage">
               {{ errorMessage }}
             </div>
+
+            <div class="success-banner" *ngIf="successMessage">
+              {{ successMessage }}
+            </div>
           </form>
         </sp-card>
 
-        <footer class="login-footer">
-          <p>Don't have an account? <a routerLink="/register">Request access</a></p>
+        <footer class="register-footer">
+          <p>Already have an account? <a routerLink="/login">Sign in</a></p>
         </footer>
       </div>
     </div>
   `,
   styles: [`
-    .login-container {
+    .register-container {
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -73,17 +86,17 @@ import { CardComponent } from '../../../shared/components/card/card.component';
       padding: var(--spacing-md);
     }
 
-    .login-box {
+    .register-box {
       width: 100%;
       max-width: 400px;
     }
 
-    .login-header {
+    .register-header {
       text-align: center;
       margin-bottom: var(--spacing-xl);
     }
 
-    .login-header h1 {
+    .register-header h1 {
       color: var(--primary);
       font-size: 2rem;
       font-weight: 700;
@@ -91,7 +104,7 @@ import { CardComponent } from '../../../shared/components/card/card.component';
       margin-bottom: 0.5rem;
     }
 
-    .login-header p {
+    .register-header p {
       color: var(--text-muted);
       font-size: 0.875rem;
     }
@@ -119,48 +132,66 @@ import { CardComponent } from '../../../shared/components/card/card.component';
       text-align: center;
     }
 
-    .login-footer {
+    .success-banner {
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-sm);
+      background-color: #f0fff4;
+      color: var(--success);
+      border: 1px solid #9ae6b4;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      text-align: center;
+    }
+
+    .register-footer {
       margin-top: var(--spacing-xl);
       text-align: center;
       font-size: 0.875rem;
       color: var(--text-muted);
     }
 
-    .login-footer a {
+    .register-footer a {
       color: var(--primary);
       font-weight: 600;
     }
   `]
 })
-export class LoginComponent {
-  loginForm: FormGroup;
+export class RegisterComponent {
+  registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
-    this.loginForm = this.fb.group({
+    this.registerForm = this.fb.group({
       username: ['', Validators.required],
-      password: ['', Validators.required]
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   onSubmit() {
-    if (this.loginForm.valid) {
+    if (this.registerForm.valid) {
       this.isLoading = true;
       this.errorMessage = '';
+      this.successMessage = '';
       
-      this.authService.login(this.loginForm.value).subscribe({
+      this.authService.register(this.registerForm.value).subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
+          this.isLoading = false;
+          this.successMessage = 'Account created successfully! Redirecting to login...';
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
         },
         error: (err) => {
           this.isLoading = false;
-          this.errorMessage = 'Invalid username or password';
-          console.error('Login error', err);
+          this.errorMessage = err.error?.message || 'Error creating account. Please try again.';
+          console.error('Registration error', err);
         }
       });
     }

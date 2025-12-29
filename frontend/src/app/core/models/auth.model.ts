@@ -9,6 +9,12 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  email: string;
+}
+
 export interface User {
   username: string;
   roles: string[];
