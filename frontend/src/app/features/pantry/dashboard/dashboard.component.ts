@@ -68,9 +68,9 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
             <tbody>
               <tr *ngFor="let product of products()">
                 <td><strong>{{ product.name }}</strong></td>
-                <td><span class="category-tag">{{ product.category.name }}</span></td>
+                <td><span class="category-tag">{{ product.categoryName }}</span></td>
                 <td>{{ product.quantity }}</td>
-                <td>{{ product.expiryDate | date:'mediumDate' }}</td>
+                <td>{{ product.expirationDate | date:'mediumDate' }}</td>
                 <td>
                   <span [class]="'status-badge ' + product.expiryStatus.toLowerCase()">
                     {{ product.expiryStatus }}
@@ -140,8 +140,8 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
           <sp-input
             label="Expiry Date"
             type="date"
-            formControlName="expiryDate"
-            [error]="productForm.get('expiryDate')?.touched && productForm.get('expiryDate')?.invalid ? 'Valid date is required' : ''"
+            formControlName="expirationDate"
+            [error]="productForm.get('expirationDate')?.touched && productForm.get('expirationDate')?.invalid ? 'Valid date is required' : ''"
           ></sp-input>
 
           <div class="panel-actions">
@@ -435,7 +435,7 @@ export class DashboardComponent implements OnInit {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       quantity: [1, [Validators.required, Validators.min(1)]],
-      expiryDate: ['', Validators.required],
+      expirationDate: ['', Validators.required],
       categoryId: ['', Validators.required]
     });
   }
@@ -471,8 +471,8 @@ export class DashboardComponent implements OnInit {
     this.productForm.patchValue({
       name: product.name,
       quantity: product.quantity,
-      expiryDate: product.expiryDate.split('T')[0],
-      categoryId: product.category.id
+      expirationDate: product.expirationDate.split('T')[0],
+      categoryId: product.categoryId
     });
     this.isPanelOpen.set(true);
   }

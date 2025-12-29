@@ -170,6 +170,7 @@ public class ProductService implements IProductService {
 
         if (product.getCategory() != null) {
             response.setCategoryName(product.getCategory().getName());
+            response.setCategoryId(product.getCategory().getId());
         }
 
         return response;

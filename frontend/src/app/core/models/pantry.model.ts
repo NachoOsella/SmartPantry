@@ -11,14 +11,16 @@ export interface Product {
   id: number;
   name: string;
   quantity: number;
-  expiryDate: string;
-  category: Category;
+  expirationDate: string;
+  categoryName: string;
+  categoryId: number;
   expiryStatus: 'GREEN' | 'YELLOW' | 'RED';
+  daysRemaining: number;
 }
 
 export interface ProductRequest {
   name: string;
   quantity: number;
-  expiryDate: string;
+  expirationDate: string;
   categoryId: number;
 }

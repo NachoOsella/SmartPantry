@@ -18,6 +18,7 @@ public class ProductResponse {
     private LocalDate expirationDate;
     private int quantity;
     private String categoryName;
+    private Long categoryId;
     private ExpiryStatus expiryStatus;
     private long daysRemaining;
 }
