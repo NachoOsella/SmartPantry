@@ -140,8 +140,10 @@
         <sp-input label="Qty" type="number" formControlName="quantity"></sp-input>
         
         <div class="custom-select-group">
+          <label class="select-label">Category</label>
           <div class="select-wrapper">
             <select formControlName="categoryId" class="custom-select">
+              <option value="" disabled>Select category</option>
               @for (cat of categories(); track cat.id) {
                 <option [value]="cat.id">{{ cat.name }}</option>
               }
