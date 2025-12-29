@@ -28,6 +28,13 @@ public class JwtFilter implements Filter {
         try {
             if (securityEnabled) {
                 String path = httpRequest.getRequestURI();
+                
+                // Permit pre-flight OPTIONS requests
+                if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+                    chain.doFilter(request, response);
+                    return;
+                }
+
                 if (path.startsWith("/api/v1/auth") || path.equals("/api/v1/health") ||
                     path.startsWith("/swagger") || path.startsWith("/v3/api-docs") ||
                     path.equals("/swagger-ui.html") || path.equals("/")) {
