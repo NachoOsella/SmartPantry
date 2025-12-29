@@ -31,7 +31,10 @@ public class CategoryService implements ICategoryService {
     public List<CategoryResponse> getAll() {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream()
-                .map(category -> modelMapper.map(category, CategoryResponse.class))
+                .map(category -> CategoryResponse.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .build())
                 .toList();
     }
 
@@ -48,8 +51,13 @@ public class CategoryService implements ICategoryService {
         if (categoryRepository.existsByName(request.getName())) {
             throw new IllegalArgumentException("This category already exists");
         }
-        Category category = modelMapper.map(request, Category.class);
+        Category category = Category.builder()
+                .name(request.getName())
+                .build();
         Category savedCategory = categoryRepository.save(category);
-        return modelMapper.map(savedCategory, CategoryResponse.class);
+        return CategoryResponse.builder()
+                .id(savedCategory.getId())
+                .name(savedCategory.getName())
+                .build();
     }
 }

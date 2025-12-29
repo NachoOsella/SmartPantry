@@ -73,13 +73,17 @@ public class ProductService implements IProductService {
     public ProductResponse create(ProductRequest request) {
         User currentUser = userService.getCurrentUserEntity();
 
-        Product product = modelMapper.map(request, Product.class);
-        product.setUser(currentUser);
+        Product product = Product.builder()
+                .name(request.getName())
+                .expirationDate(request.getExpirationDate())
+                .quantity(request.getQuantity())
+                .user(currentUser)
+                .build();
 
         if (request.getCategoryId() != null) {
-            categoryRepository.findById(request.getCategoryId())
+            Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
-            categoryRepository.findById(request.getCategoryId()).ifPresent(product::setCategory);
+            product.setCategory(category);
         }
 
         Product savedProduct = productRepository.save(product);
@@ -100,12 +104,16 @@ public class ProductService implements IProductService {
         Product existingProduct = findProductById(id);
         verifyOwnership(existingProduct);
 
-        modelMapper.map(request, existingProduct);
+        existingProduct.setName(request.getName());
+        existingProduct.setExpirationDate(request.getExpirationDate());
+        existingProduct.setQuantity(request.getQuantity());
 
         if (request.getCategoryId() != null) {
-            categoryRepository.findById(request.getCategoryId())
+            Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
-            categoryRepository.findById(request.getCategoryId()).ifPresent(existingProduct::setCategory);
+            existingProduct.setCategory(category);
+        } else {
+            existingProduct.setCategory(null);
         }
 
         Product updatedProduct = productRepository.save(existingProduct);
@@ -164,9 +172,14 @@ public class ProductService implements IProductService {
         long daysRemaining = ChronoUnit.DAYS.between(LocalDate.now(), product.getExpirationDate());
         ExpiryStatus expiryStatus = calculateExpiryStatus(daysRemaining);
 
-        ProductResponse response = modelMapper.map(product, ProductResponse.class);
-        response.setDaysRemaining(daysRemaining);
-        response.setExpiryStatus(expiryStatus);
+        ProductResponse response = ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .expirationDate(product.getExpirationDate())
+                .quantity(product.getQuantity())
+                .daysRemaining(daysRemaining)
+                .expiryStatus(expiryStatus)
+                .build();
 
         if (product.getCategory() != null) {
             response.setCategoryName(product.getCategory().getName());
