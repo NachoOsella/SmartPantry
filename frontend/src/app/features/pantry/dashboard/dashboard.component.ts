@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product, Category } from '../../../core/models/pantry.model';
@@ -95,6 +95,9 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
         (onClose)="closePanel()">
         
         <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
+          <div class="error-banner" *ngIf="errorMessage()">
+            {{ errorMessage() }}
+          </div>
           <sp-input
             label="Product Name"
             placeholder="e.g. Milk"
@@ -123,15 +126,13 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
 
           <div class="new-category-inline" *ngIf="isAddingCategory()">
             <sp-input
-              #newCatInput
               label="New Category Name"
               placeholder="e.g. Dairy"
-              [value]="newCategoryName()"
-              (input)="updateNewCategoryName($event)"
+              [formControl]="newCategoryControl"
             ></sp-input>
             <div class="new-cat-actions">
               <sp-button variant="ghost" type="button" (click)="toggleNewCategory()">Cancel</sp-button>
-              <sp-button type="button" (click)="saveCategory()" [disabled]="!newCategoryName() || isSavingCategory">
+              <sp-button type="button" (click)="saveCategory()" [disabled]="newCategoryControl.invalid || isSavingCategory">
                 Add
               </sp-button>
             </div>
@@ -410,6 +411,17 @@ import { SidePanelComponent } from '../../../shared/components/side-panel/side-p
     ::ng-deep .panel-actions button {
       width: 100%;
     }
+
+    .error-banner {
+      margin-bottom: var(--spacing-md);
+      padding: var(--spacing-sm);
+      background-color: #fff5f5;
+      color: var(--error);
+      border: 1px solid #feb2b2;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      text-align: center;
+    }
   `]
 })
 export class DashboardComponent implements OnInit {
@@ -422,10 +434,12 @@ export class DashboardComponent implements OnInit {
   editingProduct = signal<Product | null>(null);
 
   isAddingCategory = signal(false);
-  newCategoryName = signal('');
   isSavingCategory = false;
   
+  errorMessage = signal('');
+  
   productForm: FormGroup;
+  newCategoryControl = new FormControl('', [Validators.required]);
 
   constructor(
     public authService: AuthService,
@@ -458,6 +472,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openCreatePanel() {
+    this.errorMessage.set('');
     this.editingProduct.set(null);
     this.productForm.reset({
       quantity: 1,
@@ -467,6 +482,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openEditPanel(product: Product) {
+    this.errorMessage.set('');
     this.editingProduct.set(product);
     this.productForm.patchValue({
       name: product.name,
@@ -480,27 +496,26 @@ export class DashboardComponent implements OnInit {
   closePanel() {
     this.isPanelOpen.set(false);
     this.isAddingCategory.set(false);
-    this.newCategoryName.set('');
+    this.newCategoryControl.reset();
+    this.errorMessage.set('');
   }
 
   toggleNewCategory() {
     this.isAddingCategory.set(!this.isAddingCategory());
-    this.newCategoryName.set('');
-  }
-
-  updateNewCategoryName(event: any) {
-    this.newCategoryName.set(event.target.value);
+    this.newCategoryControl.reset();
+    this.errorMessage.set('');
   }
 
   saveCategory() {
-    const name = this.newCategoryName().trim();
-    if (name) {
+    const name = this.newCategoryControl.value?.trim();
+    if (name && this.newCategoryControl.valid) {
       this.isSavingCategory = true;
+      this.errorMessage.set('');
       this.productService.createCategory({ name }).subscribe({
         next: (newCat) => {
           this.isSavingCategory = false;
           this.isAddingCategory.set(false);
-          this.newCategoryName.set('');
+          this.newCategoryControl.reset();
           
           // Refresh categories and select the new one
           this.productService.getCategories().subscribe(categories => {
@@ -508,8 +523,9 @@ export class DashboardComponent implements OnInit {
             this.productForm.patchValue({ categoryId: newCat.id });
           });
         },
-        error: () => {
+        error: (err) => {
           this.isSavingCategory = false;
+          this.errorMessage.set(err.error?.message || 'Error creating category');
         }
       });
     }
@@ -518,6 +534,7 @@ export class DashboardComponent implements OnInit {
   saveProduct() {
     if (this.productForm.valid) {
       this.isSaving = true;
+      this.errorMessage.set('');
       const productData = this.productForm.value;
       const editing = this.editingProduct();
 
@@ -531,7 +548,10 @@ export class DashboardComponent implements OnInit {
           this.closePanel();
           this.loadData();
         },
-        error: () => this.isSaving = false
+        error: (err) => {
+          this.isSaving = false;
+          this.errorMessage.set(err.error?.message || 'Error saving product');
+        }
       });
     }
   }
