@@ -2,7 +2,9 @@
 <div class="modal" [class.open]="isOpen">
   <header class="modal-header">
     <h2>{{ title }}</h2>
-    <button class="close-btn" (click)="close()">&times;</button>
+    <button class="close-btn" (click)="close()">
+      <span class="material-icons">close</span>
+    </button>
   </header>
   <div class="modal-content">
     <ng-content></ng-content>
