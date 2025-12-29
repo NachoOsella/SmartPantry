@@ -31,8 +31,8 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
       transition('* <=> *', [
         query(':enter', [
           style({ opacity: 0, transform: 'translateY(10px)' }),
-          stagger('50ms', [
-            animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+          stagger('40ms', [
+            animate('250ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
           ])
         ], { optional: true })
       ])
@@ -74,7 +74,7 @@ export class DashboardComponent implements OnInit {
   
   statusMap = {
     'GREEN': { label: 'Fresh', class: 'green' },
-    'YELLOW': { label: 'Expiring Soon', class: 'yellow' },
+    'YELLOW': { label: 'Alert', class: 'yellow' },
     'RED': { label: 'Expired', class: 'red' }
   };
 
@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.notificationService.error('Failed to load inventory.');
+        this.notificationService.error('Failed to sync inventory.');
         this.isLoading.set(false);
       }
     });
@@ -165,16 +165,16 @@ export class DashboardComponent implements OnInit {
           this.isSavingCategory = false;
           this.isAddingCategory.set(false);
           this.newCategoryControl.reset();
-          this.notificationService.success(`Category "${name}" created.`);
+          this.notificationService.success(`Category created.`);
           
           this.productService.getCategories().subscribe(categories => {
             this.categories.set(categories);
             this.productForm.patchValue({ categoryId: newCat.id });
           });
         },
-        error: (err) => {
+        error: () => {
           this.isSavingCategory = false;
-          this.notificationService.error(err.error?.message || 'Error creating category.');
+          this.notificationService.error('Error creating category.');
         }
       });
     }
@@ -193,13 +193,13 @@ export class DashboardComponent implements OnInit {
       obs.subscribe({
         next: () => {
           this.isSaving = false;
-          this.notificationService.success(`Product ${editing ? 'updated' : 'created'} successfully.`);
+          this.notificationService.success('Inventory updated.');
           this.closePanel();
           this.loadData();
         },
-        error: (err) => {
+        error: () => {
           this.isSaving = false;
-          this.notificationService.error(err.error?.message || 'Error saving product.');
+          this.notificationService.error('Sync error.');
         }
       });
     }
@@ -216,12 +216,12 @@ export class DashboardComponent implements OnInit {
     if (id !== null) {
       this.productService.deleteProduct(id).subscribe({
         next: () => {
-          this.notificationService.success('Product deleted.');
+          this.notificationService.success('Deleted.');
           this.loadData();
           this.closeDeleteModal();
         },
         error: () => {
-          this.notificationService.error('Failed to delete product.');
+          this.notificationService.error('Error.');
           this.closeDeleteModal();
         }
       });
