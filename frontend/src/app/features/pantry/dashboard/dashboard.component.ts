@@ -41,6 +41,12 @@ export class DashboardComponent implements OnInit {
   isAddingCategory = signal(false);
   isSavingCategory = false;
   
+  statusMap = {
+    'GREEN': { label: 'Fresh', class: 'green' },
+    'YELLOW': { label: 'Expiring Soon', class: 'yellow' },
+    'RED': { label: 'Expired', class: 'red' }
+  };
+
   productForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
     quantity: [1, [Validators.required, Validators.min(1)]],

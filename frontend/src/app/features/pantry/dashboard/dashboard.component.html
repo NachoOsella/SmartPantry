@@ -77,8 +77,8 @@
                   <td><span class="quantity-text">{{ product.quantity }} units</span></td>
                   <td><span class="date-text">{{ product.expirationDate | date:'MMM d, y' }}</span></td>
                   <td>
-                    <span [class]="'status-pill ' + product.expiryStatus.toLowerCase()">
-                      {{ product.expiryStatus }}
+                    <span [class]="'status-pill ' + statusMap[product.expiryStatus].class">
+                      {{ statusMap[product.expiryStatus].label }}
                     </span>
                   </td>
                   <td class="actions-col">
