@@ -28,6 +28,32 @@ label {
   transition: all 0.2s ease;
 }
 
+.input-field.with-toggle {
+  padding-right: 3rem;
+}
+
+.visibility-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fg-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.visibility-toggle:hover {
+  color: var(--fg);
+  background-color: var(--bg2);
+}
+
+.visibility-toggle .material-icons {
+  font-size: 20px;
+}
+
 .input-field:focus {
   outline: none;
   border-color: var(--border-focus);

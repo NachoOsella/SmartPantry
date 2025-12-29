@@ -2,13 +2,24 @@
   <label *ngIf="label" [for]="id">{{ label }}</label>
   <div class="field-wrapper">
     <input [id]="id"
-           [type]="type"
+           [type]="inputType"
            [placeholder]="placeholder"
            [value]="value"
            (input)="handleInput($event)"
            (blur)="onTouched()"
            [disabled]="disabled"
+           [class.with-toggle]="type === 'password'"
            class="input-field">
+    
+    <button *ngIf="type === 'password'" 
+            type="button" 
+            class="visibility-toggle" 
+            (click)="togglePasswordVisibility()"
+            [title]="isPasswordVisible ? 'Hide password' : 'Show password'">
+      <span class="material-icons">
+        {{ isPasswordVisible ? 'visibility_off' : 'visibility' }}
+      </span>
+    </button>
   </div>
   <span class="error-msg" *ngIf="error">{{ error }}</span>
 </div>

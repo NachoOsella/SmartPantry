@@ -18,15 +18,26 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@a
 })
 export class InputComponent implements ControlValueAccessor {
   @Input() label = '';
-  @Input() type = 'text';
+  @Input() type: 'text' | 'password' | 'email' | 'number' | 'date' = 'text';
   @Input() placeholder = '';
   @Input() id = 'input-' + Math.random().toString(36).substring(2, 9);
   @Input() error = '';
   @Input() disabled = false;
   @Input() value = '';
 
+  isPasswordVisible = false;
+
   onChange: any = () => {};
   onTouched: any = () => {};
+
+  togglePasswordVisibility() {
+    this.isPasswordVisible = !this.isPasswordVisible;
+  }
+
+  get inputType() {
+    if (this.type !== 'password') return this.type;
+    return this.isPasswordVisible ? 'text' : 'password';
+  }
 
   handleInput(event: any) {
     this.value = event.target.value;
