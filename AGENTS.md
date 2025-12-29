@@ -1,117 +1,113 @@
 # Agent Guide - SmartPantry Monorepo
 
-This document provides essential information for autonomous agents working on the SmartPantry project.
+This document provides essential information for autonomous agents (like opencode) working on the SmartPantry project. Adhere strictly to these guidelines to maintain consistency and quality.
 
 ## 1. Project Overview
-SmartPantry is a monorepo containing a Spring Boot backend and an Angular frontend.
+SmartPantry is a domestic inventory management system. It features a Spring Boot backend and an Angular 19 frontend, containerized with Docker.
 
 ### Backend
 - **Location:** `/backend`
-- **Language:** Java 21
-- **Framework:** Spring Boot 4.0.1
-- **Build System:** Maven
+- **Stack:** Java 21, Spring Boot 4.0.1, Maven, PostgreSQL (Prod) / H2 (Dev/Test).
+- **Architecture:** Controller-Service-Repository pattern.
 
 ### Frontend
 - **Location:** `/frontend`
-- **Language:** TypeScript
-- **Framework:** Angular 19+
-- **Build System:** npm
+- **Stack:** TypeScript, Angular 19+, npm, Vitest.
+- **UI:** Everforest Dark theme, Material Icons, Glassmorphism.
+- **Pattern:** Smart/Dumb components, Signals-based state management.
 
 ## 2. Critical Commands
 
-### Backend (from /backend)
-- **Compile:** `./mvnw clean compile`
-- **Test:** `./mvnw test`
-- **Run:** `./mvnw spring-boot:run`
+### Infrastructure
+- **Full Stack (Docker):** `docker compose up --build`
+- **Prune Volumes:** `docker volume prune` (Use with caution)
 
-### Frontend (from /frontend)
+### Backend (from `/backend`)
+- **Compile:** `./mvnw clean compile`
+- **Run Tests:** `./mvnw test`
+- **Run Single Test:** `./mvnw test -Dtest=ClassName` (e.g., `./mvnw test -Dtest=SmartPantryApplicationTests`)
+- **Run Application:** `./mvnw spring-boot:run`
+- **Linter (Checkstyle):** `./mvnw checkstyle:check` (if configured)
+
+### Frontend (from `/frontend`)
 - **Install:** `npm install`
 - **Build:** `npm run build`
-- **Test:** `npm test`
-- **Start:** `npm start`
+- **Dev Server:** `npm start`
+- **Run Tests:** `npx vitest run` (since 'test' script may be missing)
+- **Single Test File:** `npx vitest run path/to/file.spec.ts`
 
 ## 3. Project Structure
-- `backend/src/main/java/SmartPantry/demo/`: Java source code.
-- `frontend/src/`: Angular source code.
-    - `configs/`: Configuration classes (e.g., ModelMapper).
+- `backend/src/main/java/SmartPantry/demo/`:
+    - `configs/`: Security (JWT), CORS, and Global Filters.
     - `controllers/`: REST API endpoints.
-    - `services/`: Business logic.
-        - `interfaces/`: Service interfaces (prefixed with `I`).
-    - `repositories/`: Data access layer (Spring Data JPA).
-    - `entities/`: JPA entities and Enums.
-    - `dtos/`: Data Transfer Objects.
-        - `requests/`: Input validation DTOs.
-        - `responses/`: Output DTOs.
-    - `exceptions/`: Custom exceptions and global error handling.
+    - `services/`: Business logic. Prefix interfaces with `I`.
+    - `dtos/`: `requests/` for inputs, `responses/` for outputs.
+    - `entities/`: JPA entities.
+    - `exceptions/`: Custom exceptions and `GlobalExceptionHandler`.
+- `frontend/src/app/`:
+    - `core/`: Singletons (services, guards, interceptors, models).
+    - `shared/`: Reusable dumb components (buttons, inputs, cards).
+    - `features/`: Smart components organized by domain (auth, pantry).
 
 ## 4. Coding Style & Conventions
 
 ### Naming Conventions
-- **Packages:** Use `SmartPantry.demo` as the base package (Note the PascalCase in the root package).
+- **Packages:** `SmartPantry.demo` (PascalCase root package name is intentional).
 - **Classes:** PascalCase (e.g., `ProductService`).
 - **Interfaces:** Prefix with `I` (e.g., `IProductService`).
-- **Methods/Variables:** camelCase (e.g., `getAllForCurrentUser`).
+- **Methods/Variables:** camelCase (e.g., `getExpiringProducts`).
 - **Constants:** UPPER_SNAKE_CASE.
-- **Enums:** PascalCase for the type, UPPER_SNAKE_CASE for values.
+- **Enums:** PascalCase type, UPPER_SNAKE_CASE values.
 
-### Formatting
-- **Indentation:** Use 4 spaces for most classes (Services, Entities, etc.). Note: Some existing Controllers may use 2 spaces; prioritize consistency within the file you are editing.
-- **Braces:** Use K&R style (braces on the same line as the statement).
-- **Imports:** Group imports by package. Avoid wildcard imports where possible, except for common Spring annotations in controllers if already present.
+### Formatting & Imports
+- **Indentation:** 4 spaces for Java, 2 spaces for TS/HTML/CSS.
+- **Braces:** K&R style (opening brace on the same line).
+- **Imports:** Group by package. No wildcard imports (except common Spring annotations in controllers).
+- **Styles:** Use Pure CSS with Everforest Dark variables defined in `styles.css`.
 
-### Dependencies & Boilerplate
+### Backend Implementation
+- **Manual Mapping:** **NEVER** use ModelMapper or AutoMapper. Use manual Builder-based mapping in the Service layer for performance and reliability.
 - **Lombok:** Use `@Data`, `@NoArgsConstructor`, `@AllArgsConstructor`, and `@Builder` for Entities and DTOs.
-- **Constructor Injection:** Use `@RequiredArgsConstructor` for dependency injection in Controllers and Services.
-- **Validation:** Use `jakarta.validation.constraints` annotations (e.g., `@NotBlank`, `@NotNull`, `@FutureOrPresent`) in DTOs.
+- **Constructor Injection:** Use `@RequiredArgsConstructor` for DI.
+- **Validation:** Use `jakarta.validation.constraints` (e.g., `@NotBlank`, `@NotNull`, `@FutureOrPresent`) in Request DTOs.
 
-### REST API Design
-- **Endpoints:** Use lowercase kebab-case for URLs (e.g., `/api/products`).
-- **Methods:** Follow standard HTTP verbs (GET, POST, PUT, DELETE).
-- **Responses:** Always return `ResponseEntity<T>`.
+### Frontend Implementation
+- **Angular Signals:** Use Signals (`signal`, `computed`, `effect`) for all reactive state. Avoid RXJS `BehaviorSubject` where Signals are appropriate.
+- **Smart/Dumb Pattern:**
+    - **Dumb:** No logic, only `@Input` and `@Output`. Reusable and stateless.
+    - **Smart:** Injects services, manages state via Signals, and handles events from dumb components.
+- **3-File Structure:** Every component MUST have separate `.ts`, `.html`, and `.css` files. **NO INLINE TEMPLATES OR STYLES.**
+
+## 5. REST API Design
+- **Endpoints:** Lowercase kebab-case (e.g., `/api/v1/products`).
+- **Versioning:** Always use `/api/v1` prefix.
+- **Contract:** Match DTO field names between frontend and backend exactly (e.g., `expirationDate`).
 - **Status Codes:**
     - `200 OK`: Successful GET/PUT.
     - `201 Created`: Successful POST.
     - `204 No Content`: Successful DELETE.
-    - `400 Bad Request`: Validation errors.
+    - `400 Bad Request`: Validation or logic errors.
+    - `401 Unauthorized`: Missing/Invalid JWT.
     - `404 Not Found`: Resource not found.
 
-## 5. Testing Best Practices
-- **Unit Tests:** Use Mockito to mock dependencies (Repositories/Services).
-- **Integration Tests:** Use `@SpringBootTest` and `@ActiveProfiles("dev")` to test with H2.
-- **Controller Tests:** Use `MockMvc` for testing API endpoints without starting the full server.
-- **Naming:** Test methods should be descriptive (e.g., `shouldReturnProduct_WhenIdExists`).
-- **Assertions:** Use AssertJ (`assertThat`) for fluent assertions.
-
 ## 6. Error Handling
-- Use `GlobalExceptionHandler` to catch and format exceptions.
-- Return `ErrorResponse` DTO for all errors.
-- Prefer throwing standard Spring/Persistence exceptions (e.g., `EntityNotFoundException`) or specific `IllegalArgumentException` which are already handled globally.
+- **Backend:** Throw standard or custom exceptions. `GlobalExceptionHandler` will catch and return `ErrorResponse`.
+- **Frontend:** Use `NotificationService` to display bottom-center toasts for errors and success messages.
 
-## 7. Service Layer Pattern
-- Always define an interface in `services.interfaces`.
-- Implement the interface in `services`.
-- Inject the interface, not the implementation.
-- Use `ModelMapper` for converting between Entities and DTOs.
+## 7. Security & Authentication
+- **JWT:** Tokens are stored in `localStorage` and injected via `JwtInterceptor`.
+- **Guards:** Protect routes using `authGuard`.
+- **Ownership:** Service layer **MUST** verify that the resource belongs to the currently authenticated user (`user_id` check).
 
-## 8. Database & Persistence
-- **Entities:** Annotate with `@Entity` and `@Table`. Use `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)` for primary keys.
-- **Relationships:** Use `FetchType.LAZY` for `@ManyToOne` and `@OneToMany` to avoid performance issues.
-- **Repositories:** Extend `JpaRepository<Entity, IdType>`.
-- **Queries:** Prefer Spring Data query methods; use `@Query` for complex logic.
+## 8. Git & Workflow
+- **Atomic Commits:** Make small, descriptive commits (e.g., `feat: ...`, `fix: ...`, `chore: ...`).
+- **Tests:** Run `./mvnw test` before pushing backend changes.
+- **Docker:** If modifying dependencies or configurations, verify with `docker compose up --build`.
 
-## 9. Security & Authentication
-- Authentication is handled via `AuthService` and `AuthController`.
-- Always check resource ownership in the service layer by comparing the current user's ID with the resource's `user_id`.
-- Use `IUserService.getCurrentUser()` to retrieve the authenticated user context.
-
-## 10. Git & Workflow
-- Ensure all tests pass before completing a task.
-- Follow existing patterns for commit messages (if a repo exists).
-- Do not modify `pom.xml` unless adding a necessary dependency.
-
-## 11. Model Specific Rules
-- When implementing a service method, check the "TO DO" comments in existing service implementations for specific logic requirements.
-- Always verify if the resource being accessed belongs to the currently authenticated user (logic for this should be in the service layer).
+## 9. Environment Specifics
+- **Port 80:** Frontend (Nginx).
+- **Port 8080:** Backend API.
+- **PostgreSQL:** Port 5432.
 
 ---
-*This file is generated for automated agents. Maintain the structure and conventions described herein.*
+*This guide is for automated agents. Maintain these standards to ensure project health.*
