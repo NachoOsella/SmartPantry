@@ -2,6 +2,7 @@ package SmartPantry.demo.services;
 
 import SmartPantry.demo.dtos.requests.ProductRequest;
 import SmartPantry.demo.dtos.responses.ProductResponse;
+import SmartPantry.demo.entities.Category;
 import SmartPantry.demo.entities.Product;
 import SmartPantry.demo.entities.User;
 import SmartPantry.demo.entities.enums.ExpiryStatus;
@@ -12,7 +13,6 @@ import SmartPantry.demo.repositories.ProductRepository;
 import SmartPantry.demo.services.interfaces.IProductService;
 import SmartPantry.demo.services.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,7 +30,6 @@ public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final IUserService userService;
-    private final ModelMapper modelMapper;
 
     /**
      * Retrieves all products belonging to the currently authenticated user.

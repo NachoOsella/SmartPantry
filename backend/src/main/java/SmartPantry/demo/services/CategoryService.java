@@ -9,7 +9,6 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 public class CategoryService implements ICategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ModelMapper modelMapper;
 
     /**
      * Retrieves all available categories.

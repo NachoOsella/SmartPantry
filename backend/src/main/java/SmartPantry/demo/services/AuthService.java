@@ -20,7 +20,6 @@ import java.util.Set;
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
     private final SmartPantry.demo.configs.JwtUtil jwtUtil;
 
     /**
@@ -38,7 +37,11 @@ public class AuthService implements IAuthService {
             throw new IllegalArgumentException("Email is already registered");
         }
 
-        User user = modelMapper.map(request, User.class);
+        User user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .build();
         userRepository.save(user);
     }
 
