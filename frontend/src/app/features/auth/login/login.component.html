@@ -1,0 +1,42 @@
+<div class="login-container">
+  <div class="login-box">
+    <header class="login-header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      </div>
+      <h1>SmartPantry</h1>
+      <p>Precision inventory management</p>
+    </header>
+
+    <sp-card>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <sp-input
+          id="username"
+          label="Username"
+          placeholder="Enter your username"
+          formControlName="username"
+          [error]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid ? 'Username is required' : ''"
+        ></sp-input>
+
+        <sp-input
+          id="password"
+          label="Password"
+          type="password"
+          placeholder="Enter your password"
+          formControlName="password"
+          [error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid ? 'Password is required' : ''"
+        ></sp-input>
+
+        <div class="form-actions">
+          <sp-button type="submit" [disabled]="loginForm.invalid || isLoading">
+            {{ isLoading ? 'Authenticating...' : 'Sign in' }}
+          </sp-button>
+        </div>
+      </form>
+    </sp-card>
+
+    <footer class="login-footer">
+      <p>New here? <a routerLink="/register">Create an account</a></p>
+    </footer>
+  </div>
+</div>
