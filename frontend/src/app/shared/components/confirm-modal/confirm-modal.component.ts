@@ -13,7 +13,8 @@ export class ConfirmModalComponent {
   @Input() isOpen = false;
   @Input() title = 'Confirm Action';
   @Input() message = 'Are you sure you want to proceed?';
-  
+  @Input() confirmDisabled = false;
+
   @Output() onConfirm = new EventEmitter<void>();
   @Output() onCancel = new EventEmitter<void>();
 

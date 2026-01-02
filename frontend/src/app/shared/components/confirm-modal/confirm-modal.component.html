@@ -9,6 +9,6 @@
   </div>
   <div class="modal-footer">
     <sp-button variant="ghost" (click)="cancel()">Cancel</sp-button>
-    <sp-button variant="danger" (click)="confirm()">Delete</sp-button>
+    <sp-button variant="danger" (click)="confirm()" [disabled]="confirmDisabled">Delete</sp-button>
   </div>
 </div>
