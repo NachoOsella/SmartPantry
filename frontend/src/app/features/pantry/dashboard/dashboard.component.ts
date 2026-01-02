@@ -75,6 +75,7 @@ export class DashboardComponent implements OnInit {
   isAddingCategory = signal(false);
   isSavingCategory = signal(false);
   isLoadingCategories = signal(false);
+  isMobileMenuOpen = signal(false);
   
   statusMap = {
     'GREEN': { label: 'Fresh', class: 'green' },
@@ -256,5 +257,13 @@ export class DashboardComponent implements OnInit {
     this.isDeleteModalOpen.set(false);
     this.productToDeleteId.set(null);
     document.body.classList.remove('scroll-lock');
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen.set(false);
   }
 }

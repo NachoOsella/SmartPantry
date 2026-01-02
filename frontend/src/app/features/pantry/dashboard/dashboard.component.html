@@ -7,7 +7,7 @@
         </div>
         <span>SmartPantry</span>
       </div>
-      
+
       <div class="user-section">
         <div class="user-info">
           <span class="username">{{ authService.currentUser()?.username }}</span>
@@ -18,9 +18,29 @@
           <span class="material-icons">logout</span>
         </button>
       </div>
+
+      <button class="navbar-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
+        <span class="material-icons">menu</span>
+      </button>
     </div>
   </nav>
-  
+
+  <div class="mobile-menu" [class.open]="isMobileMenuOpen()">
+    <div class="mobile-menu-user">
+      <div class="avatar">{{ authService.currentUser()?.username?.[0]?.toUpperCase() }}</div>
+      <div>
+        <div class="username">{{ authService.currentUser()?.username }}</div>
+        <div style="font-size: 0.75rem; color: var(--fg-dim);">Signed in</div>
+      </div>
+    </div>
+    <div class="mobile-menu-actions">
+      <sp-button variant="ghost" (click)="authService.logout()">
+        <span class="material-icons" style="margin-right: 8px;">logout</span>
+        Sign out
+      </sp-button>
+    </div>
+  </div>
+
   <main class="content">
     <div class="container">
       <header class="content-header">
