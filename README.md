@@ -1,4 +1,4 @@
-# 🍃 SmartPantry: Domestic Inventory Intelligence
+# SmartPantry: Domestic Inventory Intelligence
 
 <div align="center">
   <img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21" />
@@ -11,47 +11,53 @@
 
 ---
 
-## 📖 Overview
+## Overview
 
-**SmartPantry** is a full-stack, enterprise-grade domestic inventory management system designed to eliminate food waste and optimize household efficiency. Developed as a high-performance monorepo, it combines a robust **Spring Boot** backend with a cutting-edge **Angular 19** frontend, all wrapped in a sophisticated **Everforest Dark** aesthetic.
+I developed **SmartPantry** as a professional-grade domestic inventory management system engineered to eliminate food waste through automated intelligence. I built this high-performance monorepo using a robust **Spring Boot 4** backend and a reactive **Angular 19** frontend, harmonized by a sophisticated **Everforest Dark** aesthetic.
 
-This project showcases professional software engineering practices, including secure containerization, reactive state management, and refined UX design.
-
-## ✨ Key Features
-
-### 🛒 Precision Inventory Tracking
-*   **Real-time Stock Management**: Add, update, and track products with precision.
-*   **Intelligent Expiry Alerts**: Visual indicators (Fresh, Alert, Expired) based on dynamic date calculations.
-*   **Category Organization**: Custom category management with inline creation for seamless workflows.
-
-### 🎨 Premium User Experience
-*   **Everforest Glass UI**: A professional dark theme featuring glassmorphism, refined typography, and Material Icons.
-*   **SaaS-Grade Interactions**: Staggered row animations, real-time search filtering, and floating center modals.
-*   **Responsive Architecture**: Designed for clarity and usability across all desktop environments.
-
-### 🛡️ Secure & Scalable
-*   **JWT Authentication**: Secure login and registration flow with automated token management.
-*   **Protected Routing**: Guarded dashboard access and backend ownership verification.
-*   **Persistence**: PostgreSQL 17 integration with Docker volumes for durable data management.
-
-## 🛠️ Technical Architecture
-
-### Backend (Java 21 / Spring Boot 4)
-- **Manual DTO Mapping**: High-performance mapping without the overhead of heavy reflection libraries.
-- **Global Error Handling**: Centralized exception management for consistent API responses.
-- **Distroless Containerization**: Utilizing Google Distroless images to reduce the attack surface and image size.
-
-### Frontend (Angular 19 / TypeScript)
-- **Signals-based State**: Reactive state management for high performance and clean data flow.
-- **Smart/Dumb Component Pattern**: Separation of concerns for maximum maintainability.
-- **Pure CSS Layouts**: Optimized styling with zero-runtime CSS overhead.
+In this project, I implemented advanced full-stack patterns, including automated background status processing, a fortified security architecture, and a 100% adaptive mobile-first user experience.
 
 ---
 
-## 🚀 Quick Start
+## Key Features
 
-### 🐳 Run with Docker (Recommended)
-Deploy the entire stack including the database with a single command:
+### Automated Inventory Intelligence
+*   **Precision Tracking**: I implemented real-time management of product quantities, categories, and expiration milestones.
+*   **Unified Expiry Logic**: I standardized a 7-day threshold calculation used across both API responses and background processing.
+*   **Automated Maintenance**: I created a daily background task (Cron) that recalibrates every product's status (Fresh, Alert, Expired) at midnight.
+
+### Premium Responsive UX
+*   **Everforest Glass UI**: I designed a professional dark theme utilizing glassmorphism, refined typography, and custom high-contrast SVG branding.
+*   **100% Adaptive Architecture**: I ensured a seamless experience across small phones, tablets, and desktops with a dedicated mobile navigation system.
+*   **SaaS-Grade Interactions**: I added optimistic UI updates, staggered animations, and robust global error handling with user-friendly feedback.
+
+### Fortified Security Architecture
+*   **Advanced Encryption**: I integrated secure **BCrypt** password hashing to ensure the cryptographic integrity of user credentials.
+*   **Seamless Persistence**: I developed an automated **JWT Refresh Cycle** to keep sessions active without requiring re-authentication.
+*   **Robust Security Chain**: I configured a centralized **Spring SecurityFilterChain** with rigorous CORS protection and stateless session management.
+
+---
+
+## Technical Architecture
+
+### Backend (Java 21 / Spring Boot 4.0.1)
+- **Manual DTO Mapping**: I chose a high-performance mapping pattern using the Builder pattern for maximum reliability and performance.
+- **Scheduled Services**: I utilized Spring `@Scheduled` tasks for automated inventory health checks.
+- **Security Context**: I implemented a thread-local UserContext for secure, isolated request handling.
+- **Distroless Deployment**: I use Google Distroless images for a minimal, hardened production environment.
+
+### Frontend (Angular 19 / TypeScript)
+- **Signals-based State**: I employed cutting-edge reactive state management for predictable data flow and peak performance.
+- **Smart/Dumb Component Pattern**: I followed a clean architectural separation to ensure high reusability and maintainability.
+- **Pure CSS Transitions**: I optimized the UI with hardware-accelerated animations and zero runtime overhead.
+- **Global Interceptors**: I centralized the handling of JWT injection, token refresh, and typed API errors.
+
+---
+
+## Quick Start
+
+### Run with Docker (Recommended)
+You can deploy the full enterprise stack (Frontend, Backend, and Database) with a single command:
 
 ```bash
 docker compose up --build
@@ -60,12 +66,12 @@ docker compose up --build
 | Service | Access URL |
 | :--- | :--- |
 | **Frontend UI** | [http://localhost:80](http://localhost:80) |
-| **REST API** | [http://localhost:8080](http://localhost:8080) |
-| **Database** | `localhost:5432` |
+| **REST API** | [http://localhost:8080/api/v1](http://localhost:8080/api/v1) |
+| **Swagger Docs** | [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) |
 
 ---
 
-## 💻 Development Workflow
+## Development Workflow
 
 ### Backend Setup
 ```bash
@@ -83,9 +89,14 @@ npm start
 
 ---
 
-## 👨‍💻 Author
+## Author
 **Nacho Osella**  
 *Full Stack Developer focused on high-performance, clean-code solutions.*
+
+---
+
+## AI Authorship Note
+**Disclaimer**: This project showcases advanced AI-human collaboration. While I architected the system architecture, business logic, and security protocols, **100% of the CSS styles and a significant portion of the HTML templates were generated and optimized using AI** to achieve this professional aesthetic.
 
 ---
 *For internal agent instructions and coding standards, see [AGENTS.md](./AGENTS.md).*
