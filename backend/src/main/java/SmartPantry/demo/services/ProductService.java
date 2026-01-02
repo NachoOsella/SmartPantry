@@ -190,6 +190,12 @@ public class ProductService implements IProductService {
 
     /**
      * Logic to determine the expiration status based on days remaining.
+     * RED: expired (< 0 days)
+     * YELLOW: expires within 7 days (including today)
+     * GREEN: expires after 7 days
+     *
+     * @param daysRemaining number of days until expiration
+     * @return the calculated expiry status
      */
     private ExpiryStatus calculateExpiryStatus(long daysRemaining) {
         if (daysRemaining < 0) {

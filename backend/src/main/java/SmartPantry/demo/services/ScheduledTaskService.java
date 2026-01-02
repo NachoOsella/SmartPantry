@@ -31,15 +31,13 @@ public class ScheduledTaskService {
 
         try {
             LocalDate today = LocalDate.now();
-            LocalDate threeDaysFromNow = today.plusDays(3);
-            LocalDate expiredDate = today.minusDays(1);
 
-            // 1. Fetch products needing status update
+            // 1. Fetch all products
             List<Product> allProducts = productRepository.findAll();
 
             int updatedCount = 0;
             for (Product product : allProducts) {
-                ExpiryStatus newStatus = calculateExpiryStatus(product.getExpirationDate(), today, threeDaysFromNow, expiredDate);
+                ExpiryStatus newStatus = calculateExpiryStatus(product.getExpirationDate(), today);
 
                 if (!newStatus.equals(product.getExpiryStatus())) {
                     product.setExpiryStatus(newStatus);
@@ -55,23 +53,21 @@ public class ScheduledTaskService {
     }
 
     /**
-     * Calculates the expiry status based on the product's expiration date.
+     * Calculates expiry status based on product's expiration date.
+     * RED: expired (< 0 days remaining)
+     * YELLOW: expires within 7 days (including today)
+     * GREEN: expires after 7 days
      *
-     * @param expirationDate the expiration date of the product
-     * @param today the current date
-     * @param threeDaysFromNow date three days in the future
-     * @param expiredDate one day in the past (to account for timezone issues)
-     * @return the calculated expiry status
+     * @param expirationDate expiration date of product
+     * @param today current date
+     * @return calculated expiry status
      */
-    private ExpiryStatus calculateExpiryStatus(LocalDate expirationDate, LocalDate today,
-                                                   LocalDate threeDaysFromNow, LocalDate expiredDate) {
-        if (expirationDate.isBefore(expiredDate) || expirationDate.isEqual(expiredDate)) {
+    private ExpiryStatus calculateExpiryStatus(LocalDate expirationDate, LocalDate today) {
+        long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(today, expirationDate);
+
+        if (daysRemaining < 0) {
             return ExpiryStatus.RED;
-        } else if (expirationDate.isBefore(today)) {
-            return ExpiryStatus.RED;
-        } else if (expirationDate.isEqual(today)) {
-            return ExpiryStatus.YELLOW;
-        } else if (expirationDate.isBefore(threeDaysFromNow) || expirationDate.isEqual(threeDaysFromNow)) {
+        } else if (daysRemaining <= 7) {
             return ExpiryStatus.YELLOW;
         } else {
             return ExpiryStatus.GREEN;

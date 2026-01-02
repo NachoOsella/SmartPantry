@@ -5,9 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtFilter implements Filter {
@@ -56,13 +61,22 @@ public class JwtFilter implements Filter {
 
                 Long userId = jwtUtil.extractId(token);
                 String username = jwtUtil.extractName(token);
+                
+                // Set custom UserContext
                 UserContext.setCurrentUserId(userId);
                 UserContext.setCurrentUsername(username);
+
+                // IMPORTANT: Set Spring Security context so authorizeHttpRequests passes
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        username, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
             chain.doFilter(request, response);
         } finally {
             UserContext.clear();
+            SecurityContextHolder.clearContext();
         }
     }
 }
