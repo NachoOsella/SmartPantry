@@ -7,14 +7,32 @@
   padding: var(--spacing-md);
 }
 
+@media (max-width: 480px) {
+  .register-container {
+    padding: var(--spacing-sm);
+  }
+}
+
 .register-box {
   width: 100%;
   max-width: 400px;
 }
 
+@media (max-width: 480px) {
+  .register-box {
+    max-width: 100%;
+  }
+}
+
 .register-header {
   text-align: center;
   margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 480px) {
+  .register-header {
+    margin-bottom: var(--spacing-md);
+  }
 }
 
 .logo {
@@ -36,10 +54,16 @@
 
 .register-header h1 {
   color: var(--primary);
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   margin-bottom: 0.25rem;
+}
+
+@media (min-width: 480px) {
+  .register-header h1 {
+    font-size: 2rem;
+  }
 }
 
 .register-header p {
