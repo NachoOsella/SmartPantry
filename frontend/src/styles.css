@@ -5,20 +5,20 @@
   --bg2: #3d484d;
   --bg3: #475258;
   --bg-dim: #232a2e;
-  
+
   --fg: #d3c6aa;
   --fg-dim: #9da9a0;
-  
+
   --primary: #a7c080;
   --primary-hover: #b3cc93;
   --primary-bg: rgba(167, 192, 128, 0.1);
-  
+
   --blue: #7fbbb3;
   --aqua: #83c092;
   --orange: #e69875;
   --red: #e67e80;
   --yellow: #dbbc7f;
-  
+
   --border: #475258;
   --border-focus: #a7c080;
 
@@ -31,6 +31,38 @@
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Responsive Breakpoints */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1400px;
+
+  /* Touch-friendly sizes */
+  --touch-target: 44px;
+  --tap-target: 48px;
+
+  /* Opacity Variables */
+  --glass-bg: rgba(52, 63, 68, 0.7);
+  --glass-border: rgba(211, 198, 170, 0.1);
+  --primary-bg-soft: rgba(167, 192, 128, 0.02);
+  --danger-bg: rgba(230, 126, 128, 0.1);
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
 }
 
 * {
@@ -45,6 +77,11 @@ body {
   color: var(--fg);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
 button {
@@ -72,10 +109,10 @@ ul {
 
 /* Glassmorphism Utility */
 .glass {
-  background: rgba(52, 63, 68, 0.7) !important;
+  background: var(--glass-bg) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(211, 198, 170, 0.1) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
 }
 
 html {
@@ -114,4 +151,82 @@ body.scroll-lock {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Responsive Container */
+.responsive-container {
+  width: 100%;
+  max-width: var(--container-2xl);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .responsive-container {
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+/* Smooth transitions for responsive changes */
+* {
+  transition-property: none;
+  transition-duration: 0ms;
+}
+
+@media (min-width: 768px) {
+  * {
+    transition-property: transform, opacity, color, background-color;
+    transition-duration: 0.2s;
+  }
+}
+
+/* Improved Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Remove default focus on mobile touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button:focus,
+  input:focus,
+  select:focus {
+    outline: none;
+  }
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  button:active,
+  .action-btn:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* Larger touch targets on mobile */
+@media (max-width: 768px) {
+  button,
+  .action-btn,
+  input,
+  select {
+    min-height: var(--touch-target);
+  }
+}
+
+/* Selection Colors */
+::selection {
+  background-color: var(--primary-bg);
+  color: var(--primary);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
