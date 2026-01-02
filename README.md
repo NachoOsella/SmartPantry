@@ -73,18 +73,25 @@ docker compose up --build
 
 ## Development Workflow
 
-### Backend Setup
+I use Docker Compose to manage the entire development environment, ensuring seamless integration between the frontend, backend, and database.
+
+### Core Commands
 ```bash
-cd backend
-./mvnw clean compile
-./mvnw spring-boot:run
+# Build and start all services in the background
+docker compose up --build -d
+
+# Stop all services and remove containers
+docker compose down
+
+# View live logs for all services
+docker compose logs -f
 ```
 
-### Frontend Setup
+### Database Management
+The PostgreSQL database is persisted using a Docker volume. To reset the database state:
 ```bash
-cd frontend
-npm install
-npm start
+docker compose down -v
+docker compose up --build -d
 ```
 
 ---
