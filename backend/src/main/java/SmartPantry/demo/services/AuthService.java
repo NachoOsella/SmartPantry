@@ -7,7 +7,7 @@ import SmartPantry.demo.entities.User;
 import SmartPantry.demo.repositories.UserRepository;
 import SmartPantry.demo.services.interfaces.IAuthService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -21,12 +21,13 @@ public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
     private final SmartPantry.demo.configs.JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     /**
-     * Registers a new user in the system.
+     * Registers a new user in system with password hashing.
      *
-     * @param request the registration details including username, email, and password
-     * @throws IllegalArgumentException if the username or email is already taken
+     * @param request registration details including username, email, and password
+     * @throws IllegalArgumentException if username or email is already taken
      */
     @Override
     public void register(RegisterRequest request) {
@@ -40,7 +41,7 @@ public class AuthService implements IAuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
         userRepository.save(user);
     }
@@ -48,16 +49,16 @@ public class AuthService implements IAuthService {
     /**
      * Authenticates a user and generates a JWT token.
      *
-     * @param request the login credentials (username and password)
-     * @return an {@link AuthResponse} containing the JWT token, username, and roles
-     * @throws IllegalArgumentException if the username or password is invalid
+     * @param request login credentials (username and password)
+     * @return an {@link AuthResponse} containing JWT token, username, and roles
+     * @throws IllegalArgumentException if username or password is invalid
      */
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
 
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
@@ -67,6 +68,28 @@ public class AuthService implements IAuthService {
                 .token(token)
                 .username(user.getUsername())
                 .roles(Set.copyOf(user.getRoles().stream().map(Enum::name).toList()))
+                .build();
+    }
+
+    /**
+     * Generates a new JWT token for an authenticated user.
+     *
+     * @param userId the ID of the authenticated user
+     * @param username the username of the authenticated user
+     * @return an {@link AuthResponse} containing the new JWT token
+     */
+    @Override
+    public AuthResponse refreshToken(Long userId, String username) {
+        String token = jwtUtil.generateToken(userId, username);
+        return AuthResponse.builder()
+                .token(token)
+                .username(username)
+                .roles(Set.copyOf(userRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"))
+                        .getRoles()
+                        .stream()
+                        .map(Enum::name)
+                        .toList()))
                 .build();
     }
 }
