@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public class ScheduledTaskService {
      * @return calculated expiry status
      */
     private ExpiryStatus calculateExpiryStatus(LocalDate expirationDate, LocalDate today) {
-        long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(today, expirationDate);
+        long daysRemaining = ChronoUnit.DAYS.between(today, expirationDate);
 
         if (daysRemaining < 0) {
             return ExpiryStatus.RED;
