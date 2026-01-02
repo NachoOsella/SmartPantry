@@ -160,7 +160,14 @@
           <sp-input label="New Category" [formControl]="newCategoryControl"></sp-input>
           <div class="modal-actions">
             <sp-button variant="ghost" (click)="toggleNewCategory()">Cancel</sp-button>
-            <sp-button (click)="saveCategory()" [disabled]="newCategoryControl.invalid">Add</sp-button>
+            <sp-button (click)="saveCategory()" [disabled]="newCategoryControl.invalid || isSavingCategory()">
+              @if (isSavingCategory()) {
+                <span class="material-icons spin">refresh</span>
+                Adding...
+              } @else {
+                Add
+              }
+            </sp-button>
           </div>
         </div>
       }
@@ -169,7 +176,14 @@
 
       <div class="modal-actions">
         <sp-button variant="secondary" (click)="closePanel()">Cancel</sp-button>
-        <sp-button type="submit" [disabled]="productForm.invalid">Save</sp-button>
+        <sp-button type="submit" [disabled]="productForm.invalid || isSaving()">
+          @if (isSaving()) {
+            <span class="material-icons spin">refresh</span>
+            Saving...
+          } @else {
+            Save
+          }
+        </sp-button>
       </div>
     </form>
   </sp-side-panel>
@@ -180,5 +194,15 @@
     message="This item will be permanently removed."
     (onConfirm)="confirmDelete()"
     (onCancel)="closeDeleteModal()"
-  ></sp-confirm-modal>
+    [confirmDisabled]="isDeleting()"
+  >
+    <ng-template #confirmLabel>
+      @if (isDeleting()) {
+        <span class="material-icons spin">refresh</span>
+        Deleting...
+      } @else {
+        Delete
+      }
+    </ng-template>
+  </sp-confirm-modal>
 </div>

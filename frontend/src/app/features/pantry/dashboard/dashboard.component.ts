@@ -11,6 +11,7 @@ import { CardComponent } from '../../../shared/components/card/card.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { SidePanelComponent } from '../../../shared/components/side-panel/side-panel.component';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
+import { extractErrorMessage } from '../../../core/models/error.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -52,25 +53,28 @@ export class DashboardComponent implements OnInit {
   
   filteredProducts = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    return this.products().filter(p => 
-      p.name.toLowerCase().includes(term) || 
+    const products = this.products();
+    return products.filter(p =>
+      p.name.toLowerCase().includes(term) ||
       p.categoryName.toLowerCase().includes(term)
     );
   });
 
-  expiringSoonCount = computed(() => 
+  expiringSoonCount = computed(() =>
     this.products().filter(p => p.expiryStatus !== 'GREEN').length
   );
-  
+
   isPanelOpen = signal(false);
-  isSaving = false;
+  isSaving = signal(false);
   editingProduct = signal<Product | null>(null);
 
   isDeleteModalOpen = signal(false);
   productToDeleteId = signal<number | null>(null);
+  isDeleting = signal(false);
 
   isAddingCategory = signal(false);
-  isSavingCategory = false;
+  isSavingCategory = signal(false);
+  isLoadingCategories = signal(false);
   
   statusMap = {
     'GREEN': { label: 'Fresh', class: 'green' },
@@ -98,18 +102,24 @@ export class DashboardComponent implements OnInit {
         this.products.set(products);
         this.isLoading.set(false);
       },
-      error: () => {
-        this.notificationService.error('Failed to sync inventory.');
+      error: (err) => {
+        this.notificationService.error(extractErrorMessage(err) || 'Failed to sync inventory.');
         this.isLoading.set(false);
       }
     });
 
+    this.isLoadingCategories.set(true);
     this.productService.getCategories().subscribe({
       next: (categories) => {
         this.categories.set(categories);
+        this.isLoadingCategories.set(false);
         if (categories.length > 0 && !this.productForm.get('categoryId')?.value) {
           this.productForm.patchValue({ categoryId: categories[0].id });
         }
+      },
+      error: (err) => {
+        this.notificationService.error(extractErrorMessage(err) || 'Failed to load categories.');
+        this.isLoadingCategories.set(false);
       }
     });
   }
@@ -159,22 +169,27 @@ export class DashboardComponent implements OnInit {
   saveCategory() {
     const name = this.newCategoryControl.value?.trim();
     if (name && this.newCategoryControl.valid) {
-      this.isSavingCategory = true;
+      this.isSavingCategory.set(true);
       this.productService.createCategory({ name }).subscribe({
         next: (newCat) => {
-          this.isSavingCategory = false;
+          this.isSavingCategory.set(false);
           this.isAddingCategory.set(false);
           this.newCategoryControl.reset();
-          this.notificationService.success(`Category created.`);
-          
-          this.productService.getCategories().subscribe(categories => {
-            this.categories.set(categories);
-            this.productForm.patchValue({ categoryId: newCat.id });
+          this.notificationService.success(`Category "${name}" created successfully.`);
+
+          this.productService.getCategories().subscribe({
+            next: (categories) => {
+              this.categories.set(categories);
+              this.productForm.patchValue({ categoryId: newCat.id });
+            },
+            error: (err) => {
+              this.notificationService.error(extractErrorMessage(err) || 'Failed to refresh categories.');
+            }
           });
         },
-        error: () => {
-          this.isSavingCategory = false;
-          this.notificationService.error('Error creating category.');
+        error: (err) => {
+          this.isSavingCategory.set(false);
+          this.notificationService.error(extractErrorMessage(err) || 'Failed to create category.');
         }
       });
     }
@@ -182,24 +197,26 @@ export class DashboardComponent implements OnInit {
 
   saveProduct() {
     if (this.productForm.valid) {
-      this.isSaving = true;
+      this.isSaving.set(true);
       const productData = this.productForm.value;
       const editing = this.editingProduct();
 
-      const obs = editing 
+      const obs = editing
         ? this.productService.updateProduct(editing.id, productData)
         : this.productService.createProduct(productData);
 
+      const action = editing ? 'updated' : 'added';
+
       obs.subscribe({
         next: () => {
-          this.isSaving = false;
-          this.notificationService.success('Inventory updated.');
+          this.isSaving.set(false);
+          this.notificationService.success(`Product ${action} successfully.`);
           this.closePanel();
           this.loadData();
         },
-        error: () => {
-          this.isSaving = false;
-          this.notificationService.error('Sync error.');
+        error: (err) => {
+          this.isSaving.set(false);
+          this.notificationService.error(extractErrorMessage(err) || `Failed to ${action} product.`);
         }
       });
     }
@@ -214,15 +231,22 @@ export class DashboardComponent implements OnInit {
   confirmDelete() {
     const id = this.productToDeleteId();
     if (id !== null) {
+      this.isDeleting.set(true);
+
+      const currentProducts = this.products();
+
+      this.products.set(currentProducts.filter(p => p.id !== id));
+
       this.productService.deleteProduct(id).subscribe({
         next: () => {
-          this.notificationService.success('Deleted.');
-          this.loadData();
+          this.isDeleting.set(false);
+          this.notificationService.success('Product deleted successfully.');
           this.closeDeleteModal();
         },
-        error: () => {
-          this.notificationService.error('Error.');
-          this.closeDeleteModal();
+        error: (err) => {
+          this.products.set(currentProducts);
+          this.isDeleting.set(false);
+          this.notificationService.error(extractErrorMessage(err) || 'Failed to delete product.');
         }
       });
     }
