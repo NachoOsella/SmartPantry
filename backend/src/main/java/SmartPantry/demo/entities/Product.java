@@ -1,5 +1,6 @@
 package SmartPantry.demo.entities;
 
+import SmartPantry.demo.entities.enums.ExpiryStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
@@ -48,4 +49,8 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ExpiryStatus expiryStatus = ExpiryStatus.GREEN;
 }
