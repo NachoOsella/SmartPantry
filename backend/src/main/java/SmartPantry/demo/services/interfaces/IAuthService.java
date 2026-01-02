@@ -7,4 +7,5 @@ import SmartPantry.demo.dtos.responses.AuthResponse;
 public interface IAuthService {
     void register(RegisterRequest request);
     AuthResponse login(LoginRequest request);
+    AuthResponse refreshToken(Long userId, String username);
 }

@@ -4,6 +4,7 @@ import SmartPantry.demo.dtos.requests.LoginRequest;
 import SmartPantry.demo.dtos.requests.RegisterRequest;
 import SmartPantry.demo.dtos.responses.AuthResponse;
 import SmartPantry.demo.services.interfaces.IAuthService;
+import SmartPantry.demo.configs.UserContext;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -30,5 +31,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken() {
+        Long currentUserId = UserContext.getCurrentUserId();
+        String currentUsername = UserContext.getCurrentUsername();
+        return ResponseEntity.ok(authService.refreshToken(currentUserId, currentUsername));
     }
 }

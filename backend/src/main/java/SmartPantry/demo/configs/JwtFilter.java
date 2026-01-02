@@ -55,7 +55,9 @@ public class JwtFilter implements Filter {
                 }
 
                 Long userId = jwtUtil.extractId(token);
+                String username = jwtUtil.extractName(token);
                 UserContext.setCurrentUserId(userId);
+                UserContext.setCurrentUsername(username);
             }
 
             chain.doFilter(request, response);
