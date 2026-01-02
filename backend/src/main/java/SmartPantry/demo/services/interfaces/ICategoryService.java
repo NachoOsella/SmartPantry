@@ -8,4 +8,6 @@ import java.util.List;
 public interface ICategoryService {
     List<CategoryResponse> getAll();
     CategoryResponse create(CategoryRequest request);
+    CategoryResponse update(Long id, CategoryRequest request);
+    void delete(Long id);
 }

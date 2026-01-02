@@ -37,7 +37,7 @@
         ></sp-input>
 
         <div class="form-actions">
-          <sp-button type="submit" [disabled]="registerForm.invalid || isLoading">
+          <sp-button type="submit" [disabled]="registerForm.invalid || isLoading" [fullWidth]="true">
             {{ isLoading ? 'Creating account...' : 'Create account' }}
           </sp-button>
         </div>

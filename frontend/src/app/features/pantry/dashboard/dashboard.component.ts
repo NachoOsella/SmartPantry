@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
@@ -12,6 +12,8 @@ import { InputComponent } from '../../../shared/components/input/input.component
 import { SidePanelComponent } from '../../../shared/components/side-panel/side-panel.component';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { extractErrorMessage } from '../../../core/models/error.model';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,11 +47,13 @@ export class DashboardComponent implements OnInit {
   private productService = inject(ProductService);
   private notificationService = inject(NotificationService);
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
   products = signal<Product[]>([]);
   categories = signal<Category[]>([]);
   isLoading = signal(true);
   searchTerm = signal('');
+  searchControl = new FormControl('');
   
   filteredProducts = computed(() => {
     const term = this.searchTerm().toLowerCase();
@@ -94,6 +98,17 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.setupSearch();
+  }
+
+  private setupSearch() {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(value => {
+      this.searchTerm.set(value || '');
+    });
   }
 
   loadData() {
@@ -123,11 +138,6 @@ export class DashboardComponent implements OnInit {
         this.isLoadingCategories.set(false);
       }
     });
-  }
-
-  updateSearch(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.searchTerm.set(value);
   }
 
   openCreatePanel() {

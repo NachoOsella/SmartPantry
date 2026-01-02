@@ -12,5 +12,6 @@ export class ButtonComponent {
   @Input() type: 'button' | 'submit' = 'button';
   @Input() variant: 'primary' | 'secondary' | 'ghost' | 'danger' = 'primary';
   @Input() disabled = false;
+  @Input() fullWidth = false;
   @Output() onClick = new EventEmitter<MouseEvent>();
 }

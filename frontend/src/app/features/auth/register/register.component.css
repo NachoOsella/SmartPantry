@@ -73,8 +73,9 @@
 }
 
 .form-actions {
-  margin-top: var(--spacing-lg);
+  margin-top: 2rem;
 }
+
 
 .form-actions sp-button {
   width: 100%;

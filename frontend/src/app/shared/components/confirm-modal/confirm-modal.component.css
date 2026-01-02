@@ -126,7 +126,3 @@ p {
 .modal-footer sp-button {
   flex: 1;
 }
-
-::ng-deep .modal-footer button {
-  width: 100%;
-}

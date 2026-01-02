@@ -8,7 +8,7 @@
     <p>{{ message }}</p>
   </div>
   <div class="modal-footer">
-    <sp-button variant="ghost" (click)="cancel()">Cancel</sp-button>
-    <sp-button variant="danger" (click)="confirm()" [disabled]="confirmDisabled">Delete</sp-button>
+    <sp-button variant="ghost" (click)="cancel()" [fullWidth]="true">Cancel</sp-button>
+    <sp-button variant="danger" (click)="confirm()" [disabled]="confirmDisabled" [fullWidth]="true">Delete</sp-button>
   </div>
 </div>

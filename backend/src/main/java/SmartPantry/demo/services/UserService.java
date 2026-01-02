@@ -1,12 +1,14 @@
 package SmartPantry.demo.services;
 
+import SmartPantry.demo.configs.UserContext;
 import SmartPantry.demo.dtos.responses.UserResponse;
 import SmartPantry.demo.entities.User;
 import SmartPantry.demo.repositories.UserRepository;
 import SmartPantry.demo.services.interfaces.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 /**
  * Service implementation for managing user-related operations and retrieving current user context.
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
 
     /**
      * Retrieves the profile information of the currently authenticated user.
@@ -26,10 +27,17 @@ public class UserService implements IUserService {
      */
     @Override
     public UserResponse getCurrentUserResponse() {
-        Long userId = SmartPantry.demo.configs.UserContext.getCurrentUserId();
+        Long userId = UserContext.getCurrentUserId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return modelMapper.map(user, UserResponse.class);
+        
+        return UserResponse.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .roles(user.getRoles().stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toSet()))
+                .build();
     }
 
     /**
@@ -41,7 +49,7 @@ public class UserService implements IUserService {
      */
     @Override
     public User getCurrentUserEntity() {
-        Long userId = SmartPantry.demo.configs.UserContext.getCurrentUserId();
+        Long userId = UserContext.getCurrentUserId();
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }

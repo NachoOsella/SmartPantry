@@ -1,5 +1,6 @@
 package SmartPantry.demo.services;
 
+import SmartPantry.demo.configs.JwtUtil;
 import SmartPantry.demo.dtos.requests.LoginRequest;
 import SmartPantry.demo.dtos.requests.RegisterRequest;
 import SmartPantry.demo.dtos.responses.AuthResponse;
@@ -20,7 +21,7 @@ import java.util.Set;
 public class AuthService implements IAuthService {
 
     private final UserRepository userRepository;
-    private final SmartPantry.demo.configs.JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
     /**

@@ -80,7 +80,7 @@
       <sp-card title="Stock Records" [noPadding]="true">
         <div header-actions class="search-box">
           <span class="material-icons search-icon">search</span>
-          <input type="text" placeholder="Filter stock..." (input)="updateSearch($event)" [value]="searchTerm()">
+          <input type="text" placeholder="Filter stock..." [formControl]="searchControl">
         </div>
 
         <div class="table-container">

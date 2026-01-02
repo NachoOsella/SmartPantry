@@ -9,6 +9,11 @@
   justify-content: center;
   gap: 0.5rem;
   border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btn.full-width {
+  width: 100%;
 }
 
 @media (max-width: 480px) {

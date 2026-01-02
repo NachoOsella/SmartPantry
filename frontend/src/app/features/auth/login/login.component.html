@@ -28,7 +28,7 @@
         ></sp-input>
 
         <div class="form-actions">
-          <sp-button type="submit" [disabled]="loginForm.invalid || isLoading">
+          <sp-button type="submit" [disabled]="loginForm.invalid || isLoading" [fullWidth]="true">
             {{ isLoading ? 'Authenticating...' : 'Sign in' }}
           </sp-button>
         </div>
